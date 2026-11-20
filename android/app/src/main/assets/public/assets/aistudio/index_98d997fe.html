@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#b8891f">
+<title>Good Bites — Shops</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<script>
+/* Apply saved theme before first paint (same key as shop.html and login.html) */
+(function () {
+    try {
+        if (localStorage.getItem("goodBitesTheme") === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+        }
+    } catch (e) {}
+})();
+</script>
+
+<style>
+:root {
+    --bg:#fbf8f1;
+    --surface:#ffffff;
+    --surface-2:#faf5e8;
+    --ink:#2b2416;
+    --muted:#7d735e;
+    --line:#ece3cc;
+    --gold:#b8891f;
+    --gold-2:#e2bf62;
+    --gold-soft:#f6ecd0;
+    --gold-ink:#8a6414;
+    --green:#16834d;
+    --green-soft:#e3f4ea;
+    --red:#c0392b;
+    --red-soft:#fdecea;
+    --amber:#b4631b;
+    --amber-soft:#fff0e1;
+    --shadow:0 1px 2px rgba(60,44,10,.06), 0 8px 24px rgba(60,44,10,.06);
+    --radius:16px;
+    --font:'Manrope', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+    --display:'Fraunces', Georgia, serif;
+}
+
+[data-theme="dark"] {
+    --bg:#101114;
+    --surface:#1a1c21;
+    --surface-2:#22242a;
+    --ink:#f3efe4;
+    --muted:#a7a192;
+    --line:#32343b;
+    --gold:#d9ac3f;
+    --gold-2:#f0cf7a;
+    --gold-soft:#332b17;
+    --gold-ink:#f0cf7a;
+    --green:#4cc98a;
+    --green-soft:#16301f;
+    --red:#ff8b7d;
+    --red-soft:#3a2321;
+    --amber:#f0a45e;
+    --amber-soft:#36271a;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+}
+
+* { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+
+body {
+    font-family:var(--font);
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:env(safe-area-inset-bottom);
+}
+
+button, input, select, textarea { font:inherit; color:inherit; }
+button { cursor:pointer; }
+:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+
+/* ---------- Top bar ---------- */
+.topbar {
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:12px clamp(14px, 4vw, 36px);
+    padding-top:calc(12px + env(safe-area-inset-top));
+    background:color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter:saturate(1.4) blur(14px);
+    -webkit-backdrop-filter:saturate(1.4) blur(14px);
+    border-bottom:1px solid var(--line);
+}
+
+.brand { display:flex; align-items:center; gap:10px; min-width:0; text-decoration:none; color:inherit; }
+.brand img { width:44px; height:44px; object-fit:contain; flex-shrink:0; }
+.brand h2 { font-family:var(--display); font-size:20px; font-weight:700; letter-spacing:-.01em; white-space:nowrap; }
+.brand h2 span { color:var(--gold); }
+.brand small { display:block; font-size:11px; color:var(--muted); font-weight:600; }
+
+.top-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+
+.btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    border:1px solid var(--line); background:var(--surface); color:var(--ink);
+    padding:9px 14px; border-radius:10px; font-weight:700; font-size:13px;
+    transition:background .15s, border-color .15s, transform .1s;
+}
+.btn:hover { background:var(--surface-2); border-color:var(--gold-2); }
+.btn:active { transform:translateY(1px); }
+.btn-sm { padding:7px 12px; font-size:12px; border-radius:8px; }
+.btn-danger { color:var(--red); background:var(--red-soft); border-color:transparent; }
+.btn-danger:hover { background:var(--red-soft); filter:brightness(.97); border-color:var(--red); }
+
+.pill {
+    display:inline-flex; align-items:center; gap:7px;
+    padding:7px 12px; border-radius:999px; font-size:12px; font-weight:700;
+    background:var(--surface-2); border:1px solid var(--line); color:var(--muted);
+}
+.pill.live { color:var(--green); background:var(--green-soft); border-color:transparent; }
+.pill i { width:8px; height:8px; border-radius:50%; background:currentColor; display:block; }
+.pill.live i { animation:pulse 1.8s ease-out infinite; }
+@keyframes pulse {
+    0% { box-shadow:0 0 0 0 color-mix(in srgb, var(--green) 55%, transparent); }
+    100% { box-shadow:0 0 0 8px transparent; }
+}
+
+/* ---------- Layout ---------- */
+.wrap { max-width:1200px; margin:0 auto; padding:clamp(18px, 3vw, 34px) clamp(14px, 4vw, 36px) 40px; }
+
+.intro { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:20px; }
+.intro h1 { font-family:var(--display); font-size:clamp(28px, 4.5vw, 42px); line-height:1.1; letter-spacing:-.02em; }
+.intro p { color:var(--muted); font-size:15px; margin-top:6px; max-width:52ch; }
+
+.stats { display:flex; gap:10px; flex-wrap:wrap; }
+.stat {
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:12px 18px; min-width:112px;
+}
+.stat span { display:block; font-size:12px; font-weight:600; color:var(--muted); }
+.stat strong { font-size:24px; font-weight:800; letter-spacing:-.01em; }
+.stat.green strong { color:var(--green); }
+.stat.amber strong { color:var(--amber); }
+
+/* Controls */
+.controls {
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:14px; margin-bottom:22px; box-shadow:var(--shadow);
+    display:grid; gap:12px;
+}
+.controls-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+.search { position:relative; flex:1 1 260px; min-width:0; }
+.search svg { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:17px; height:17px; stroke:var(--muted); fill:none; stroke-width:2; pointer-events:none; }
+.search input {
+    width:100%; padding:11px 40px 11px 40px; border:1px solid var(--line); border-radius:999px;
+    background:var(--surface-2); outline:none; transition:border-color .15s, box-shadow .15s;
+}
+.search input:focus { border-color:var(--gold); box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 20%, transparent); }
+.search button {
+    position:absolute; right:10px; top:50%; transform:translateY(-50%);
+    width:24px; height:24px; border-radius:50%; border:none; background:var(--line); color:var(--muted);
+    display:none; place-items:center; font-size:15px; line-height:1;
+}
+
+select.sort {
+    padding:10px 14px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2);
+    font-weight:600; font-size:13px; outline:none;
+}
+select.sort:focus { border-color:var(--gold); }
+
+.chips { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding-bottom:2px; }
+.chips::-webkit-scrollbar { display:none; }
+.chip {
+    display:inline-flex; align-items:center; gap:7px; white-space:nowrap;
+    padding:8px 13px; border-radius:999px; border:1px solid var(--line); background:var(--surface);
+    font-size:12px; font-weight:700; color:var(--muted); transition:background .15s, color .15s, border-color .15s;
+}
+.chip:hover { border-color:var(--gold-2); color:var(--ink); }
+.chip small { font-size:11px; font-weight:700; opacity:.75; }
+.chip[aria-pressed="true"] { background:var(--gold); border-color:var(--gold); color:#fff; }
+
+/* Grid */
+.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:20px; }
+
+.card {
+    background:var(--surface); border:1px solid var(--line); border-radius:18px;
+    overflow:hidden; display:flex; flex-direction:column;
+    transition:border-color .15s, box-shadow .2s, transform .2s;
+}
+.card:hover { border-color:var(--gold-2); box-shadow:var(--shadow); transform:translateY(-2px); }
+.card.closed .media img, .card.closed .media .initial { filter:grayscale(.85); opacity:.8; }
+
+.media { position:relative; height:172px; background:var(--gold-soft); overflow:hidden; }
+.media img { width:100%; height:100%; object-fit:cover; display:block; }
+.initial {
+    width:100%; height:100%; display:grid; place-items:center;
+    font-family:var(--display); font-size:64px; font-weight:700; color:var(--gold);
+    background:linear-gradient(135deg, var(--gold-soft), color-mix(in srgb, var(--gold-2) 30%, var(--gold-soft)));
+}
+
+.badge {
+    position:absolute; top:12px; left:12px;
+    padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700;
+    background:color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter:blur(8px);
+    display:inline-flex; align-items:center; gap:6px;
+}
+.badge i { width:7px; height:7px; border-radius:50%; background:var(--muted); display:block; }
+.badge.open { color:var(--green); }
+.badge.open i { background:var(--green); }
+
+.body { padding:16px 18px 18px; display:flex; flex-direction:column; gap:6px; flex:1; }
+.body .cat { font-size:12px; font-weight:700; color:var(--gold-ink); }
+.body h3 { font-size:18px; font-weight:800; letter-spacing:-.01em; overflow-wrap:anywhere; display:-webkit-box; -webkit-line-clamp:1; line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+.body p { color:var(--muted); font-size:13px; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:2.9em; }
+.foot { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:auto; padding-top:12px; }
+.foot span { font-size:11px; color:var(--muted); font-weight:600; }
+
+/* Skeleton + empty */
+.skeleton { border:1px solid var(--line); border-radius:18px; overflow:hidden; background:var(--surface); height:300px; }
+.skeleton div { background:linear-gradient(90deg, var(--line), var(--surface-2), var(--line)); background-size:200% 100%; animation:shimmer 1.4s infinite; }
+.skeleton .a { height:172px; }
+.skeleton .b { height:14px; width:60%; margin:18px; border-radius:6px; }
+.skeleton .c { height:12px; width:80%; margin:0 18px; border-radius:6px; }
+@keyframes shimmer { from { background-position:200% 0; } to { background-position:-200% 0; } }
+
+.empty {
+    grid-column:1 / -1; text-align:center; padding:48px 18px;
+    border:1px dashed var(--line); border-radius:var(--radius); background:var(--surface);
+}
+.empty h3 { font-family:var(--display); font-size:22px; margin-bottom:6px; }
+.empty p { color:var(--muted); margin:0 auto 16px; max-width:42ch; }
+
+/* Toast */
+@keyframes drop { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+#toasts { position:fixed; left:50%; bottom:calc(18px + env(safe-area-inset-bottom)); transform:translateX(-50%); display:grid; gap:8px; z-index:200; width:min(380px, calc(100vw - 28px)); }
+.toast { background:var(--ink); color:var(--bg); padding:11px 16px; border-radius:12px; font-size:13px; font-weight:600; box-shadow:0 10px 30px rgba(0,0,0,.25); animation:drop .2s ease-out; }
+.toast.error { background:var(--red); color:#fff; }
+.toast.info { background:var(--gold); color:#fff; }
+
+.footer { text-align:center; font-size:12px; color:var(--muted); padding:26px 0 6px; }
+
+@media (max-width:640px) {
+    .brand small, #roleBadge { display:none; }
+    .brand h2 { font-size:17px; }
+    .brand img { width:38px; height:38px; }
+    .btn { padding:8px 10px; font-size:12px; }
+    .stats { width:100%; }
+    .stat { flex:1; min-width:0; padding:10px 12px; }
+    .stat strong { font-size:20px; }
+    .grid { grid-template-columns:1fr; }
+}
+@media (prefers-reduced-motion:reduce) {
+    *, *::before, *::after { animation:none !important; transition:none !important; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <a href="index.html" class="brand">
+        <img src="logo.png" alt="Good Bites logo">
+        <div>
+            <h2>Good<span>Bites</span></h2>
+            <small>Multi-shop management</small>
+        </div>
+    </a>
+
+    <div class="top-actions">
+        <span class="pill live" id="livePill" role="status" title="Changes made in other tabs appear here instantly"><i></i><b>Live sync</b></span>
+        <span class="pill" id="roleBadge"><b id="roleLabel">User</b></span>
+        <button class="btn" id="themeBtn" type="button" aria-label="Toggle dark mode">Dark</button>
+        <button class="btn btn-danger" id="logoutBtn" type="button">Sign out</button>
+    </div>
+</header>
+
+<main class="wrap">
+
+    <section class="intro">
+        <div>
+            <h1 id="welcomeHeading">Your shops</h1>
+            <p>Shops and receipts added by the administrator appear here live.</p>
+        </div>
+        <div class="stats" aria-label="Summary">
+            <div class="stat"><span>Total shops</span><strong id="statTotal">0</strong></div>
+            <div class="stat green"><span>Active</span><strong id="statActive">0</strong></div>
+            <div class="stat amber"><span>Closed</span><strong id="statClosed">0</strong></div>
+            <div class="stat"><span>Receipts</span><strong id="statReceipts">0</strong></div>
+            <div class="stat"><span>Pending pieces</span><strong id="statPending">0</strong></div>
+        </div>
+    </section>
+
+    <section class="controls">
+        <div class="controls-row">
+            <div class="search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="text" id="searchInput" placeholder="Search by shop name, category or description" autocomplete="off" aria-label="Search shops">
+                <button type="button" id="clearSearchBtn" aria-label="Clear search">×</button>
+            </div>
+            <select class="sort" id="sortSelect" aria-label="Sort shops">
+                <option value="name-asc">Name A–Z</option>
+                <option value="name-desc">Name Z–A</option>
+                <option value="status-active">Active first</option>
+                <option value="newest">Newest first</option>
+            </select>
+        </div>
+        <div class="chips" id="categoryChips" role="group" aria-label="Filter by category"></div>
+    </section>
+
+    <div class="grid" id="shopsGrid">
+        <div class="skeleton"><div class="a"></div><div class="b"></div><div class="c"></div></div>
+        <div class="skeleton"><div class="a"></div><div class="b"></div><div class="c"></div></div>
+        <div class="skeleton"><div class="a"></div><div class="b"></div><div class="c"></div></div>
+    </div>
+
+    <footer class="footer">© 2026 Good Bites. Data updates live.</footer>
+</main>
+
+<div id="toasts" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="sync.js"></script>
+
+<script>
+/* =========================================================
+   SESSION CHECK (set by login.html) — USER PAGE ONLY
+   Admin → admin.html. Team and shop accounts stay here.
+   ========================================================= */
+let currentSession = null;
+try {
+    const raw = sessionStorage.getItem("businessManagerSession");
+    currentSession = raw ? JSON.parse(raw) : null;
+} catch (e) { currentSession = null; }
+
+if (!currentSession || currentSession.loggedIn !== true || !currentSession.username) {
+    window.location.replace("login.html");
+    throw new Error("Login required");
+}
+
+const ADMIN_ROLES = ["admin", "administrator", "super admin", "superadmin"];
+const currentRole = String(currentSession.role || sessionStorage.getItem("businessManagerRole") || "user");
+
+if (ADMIN_ROLES.includes(currentRole.toLowerCase())) {
+    window.location.replace("admin.html");
+    throw new Error("Admins use admin.html");
+}
+
+const $ = id => document.getElementById(id);
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+    })[c]);
+}
+
+function toast(message, kind = "") {
+    const el = document.createElement("div");
+    el.className = "toast " + kind;
+    el.textContent = message;
+    $("toasts").appendChild(el);
+    setTimeout(() => el.remove(), 3200);
+}
+
+/* Role UI */
+const displayRole = currentSession.displayRole || "User";
+$("roleLabel").textContent = displayRole;
+$("welcomeHeading").textContent = "Welcome, " + displayRole;
+
+$("logoutBtn").addEventListener("click", () => {
+    ["businessManagerSession", "businessManagerRole", "businessManagerUser"]
+        .forEach(k => sessionStorage.removeItem(k));
+    window.location.replace("login.html");
+});
+
+/* =========================================================
+   STORAGE (read-only here; same key as login.html and shop.html)
+   ========================================================= */
+const STORAGE_KEY = "businessManagerDemoShops";
+const CATEGORIES = [
+    "Grocery & Mart", "Fashion & Wear", "Tech & Mobiles", "Food & Dining",
+    "Health & Pharmacy", "Home & Living", "General"
+];
+
+let shops = [];
+let activeCategory = "ALL";
+let searchQuery = "";
+let currentSort = "name-asc";
+
+function loadShops() {
+    try {
+        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+        console.error("Shop loading error:", err);
+        return [];
+    }
+}
+
+const shopId = s => String(s.id || s._id);
+const isOpen = s => (s.status || "active") === "active";
+
+const RCP_PREFIX = "businessManagerReceipts_";
+const amt = r => (Number(r.quantity) || 0) * (Number(r.price) || 0);
+const pend = r => Math.max(0, (Number(r.quantity) || 0) - (Number(r.givenQuantity) || 0));
+const money = n => "₹" + (Number(n) || 0).toLocaleString("en-IN", { minimumFractionDigits:2, maximumFractionDigits:2 });
+
+function shopTotals(s) {
+    let list = [];
+    try {
+        const parsed = JSON.parse(localStorage.getItem(RCP_PREFIX + shopId(s)) || "[]");
+        list = Array.isArray(parsed) ? parsed : [];
+    } catch (e) {}
+    return {
+        count: list.length,
+        sales: list.reduce((a, r) => a + amt(r), 0),
+        pending: list.reduce((a, r) => a + pend(r), 0)
+    };
+}
+
+/* Live sync: admin changes (other tab, other device, cloud) update this page at once */
+const GB = window.GBStore;
+GB.onStatus = state => {
+    const pill = $("livePill");
+    pill.classList.toggle("live", state === "on" || state === "off");
+    $("livePill").querySelector("b").textContent = state === "on" ? "Live" : state === "wait" ? "Connecting" : "Live (this browser)";
+};
+let refreshTimer = null;
+GB.watch(key => key === STORAGE_KEY || key.startsWith(RCP_PREFIX), key => {
+    shops = loadShops();
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(() => {
+        renderAll();
+        toast(key === STORAGE_KEY ? "Shops updated" : "Receipts updated", "info");
+    }, 120);
+});
+document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) { shops = loadShops(); renderAll(); }
+});
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+const grid = $("shopsGrid");
+
+function updateStats() {
+    const open = shops.filter(isOpen).length;
+    $("statTotal").textContent = shops.length;
+    $("statActive").textContent = open;
+    $("statClosed").textContent = shops.length - open;
+    let receipts = 0, pending = 0;
+    shops.forEach(sh => { const t = shopTotals(sh); receipts += t.count; pending += t.pending; });
+    $("statReceipts").textContent = receipts;
+    $("statPending").textContent = pending;
+}
+
+function renderChips() {
+    const counts = { ALL: shops.length };
+    shops.forEach(s => {
+        const c = s.category || "General";
+        counts[c] = (counts[c] || 0) + 1;
+    });
+    const names = ["ALL", ...CATEGORIES];
+    $("categoryChips").innerHTML = names.map(name => `
+        <button class="chip" type="button" data-category="${escapeHTML(name)}" aria-pressed="${name === activeCategory}">
+            ${name === "ALL" ? "All shops" : escapeHTML(name)} <small>${counts[name] || 0}</small>
+        </button>`).join("");
+}
+
+function renderShops() {
+    const q = searchQuery;
+    let list = shops.filter(s => {
+        if (activeCategory !== "ALL" && (s.category || "General").toLowerCase() !== activeCategory.toLowerCase()) return false;
+        if (!q) return true;
+        return [s.name, s.description, s.category].some(v => String(v || "").toLowerCase().includes(q));
+    });
+
+    list.sort((a, b) => {
+        if (currentSort === "name-asc") return String(a.name || "").localeCompare(String(b.name || ""));
+        if (currentSort === "name-desc") return String(b.name || "").localeCompare(String(a.name || ""));
+        if (currentSort === "status-active") return (isOpen(b) ? 1 : 0) - (isOpen(a) ? 1 : 0);
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    });
+
+    if (!list.length) {
+        const filtered = shops.length > 0;
+        grid.innerHTML = `
+            <div class="empty">
+                <h3>${filtered ? "No shops match your search" : "No shops yet"}</h3>
+                <p>${filtered ? "Try a different word or clear the category filter."
+                    : "An administrator has not added any shops yet."}</p>
+                ${filtered ? `<button class="btn" type="button" id="resetFiltersBtn">Clear filters</button>` : ""}
+            </div>`;
+        return;
+    }
+
+    grid.innerHTML = list.map(s => {
+        const id = escapeHTML(shopId(s));
+        const open = isOpen(s);
+        const hasImage = typeof s.image === "string" && s.image.trim() !== "";
+        const initial = escapeHTML((String(s.name || "?").trim()[0] || "?").toUpperCase());
+
+        const media = hasImage
+            ? `<img src="${escapeHTML(s.image)}" alt="${escapeHTML(s.name)}" data-initial="${initial}" loading="lazy">`
+            : `<div class="initial" aria-hidden="true">${initial}</div>`;
+
+        const t = shopTotals(s);
+        return `
+        <article class="card ${open ? "" : "closed"}">
+            <div class="media">
+                ${media}
+                <span class="badge ${open ? "open" : ""}"><i></i>${open ? "Active" : "Closed"}</span>
+            </div>
+            <div class="body">
+                <span class="cat">${escapeHTML(s.category || "General")}</span>
+                <h3>${escapeHTML(s.name)}</h3>
+                <p>${escapeHTML(s.description || "Manage receipts and given pieces for this shop.")}</p>
+                <div class="foot">
+                    <span>${t.count} receipt${t.count === 1 ? "" : "s"} · ${money(t.sales)}${t.pending ? " · " + t.pending + " pending" : ""}</span>
+                    <button type="button" class="btn btn-sm" data-action="open" data-id="${id}">Open shop</button>
+                </div>
+            </div>
+        </article>`;
+    }).join("");
+
+    /* Broken image: show the initial instead */
+    grid.querySelectorAll("img[data-initial]").forEach(img => {
+        img.addEventListener("error", () => {
+            const div = document.createElement("div");
+            div.className = "initial";
+            div.textContent = img.dataset.initial;
+            img.replaceWith(div);
+        }, { once: true });
+    });
+}
+
+function renderAll() {
+    updateStats();
+    renderChips();
+    renderShops();
+}
+
+/* =========================================================
+   FILTERS
+   ========================================================= */
+$("searchInput").addEventListener("input", e => {
+    searchQuery = e.target.value.trim().toLowerCase();
+    $("clearSearchBtn").style.display = searchQuery ? "grid" : "none";
+    renderShops();
+});
+
+$("clearSearchBtn").addEventListener("click", () => {
+    $("searchInput").value = "";
+    searchQuery = "";
+    $("clearSearchBtn").style.display = "none";
+    renderShops();
+    $("searchInput").focus();
+});
+
+$("sortSelect").addEventListener("change", e => { currentSort = e.target.value; renderShops(); });
+
+$("categoryChips").addEventListener("click", e => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    activeCategory = chip.dataset.category;
+    renderChips();
+    renderShops();
+});
+
+/* =========================================================
+   CARD ACTIONS (open shop only)
+   ========================================================= */
+grid.addEventListener("click", e => {
+    if (e.target.id === "resetFiltersBtn") {
+        searchQuery = ""; activeCategory = "ALL";
+        $("searchInput").value = ""; $("clearSearchBtn").style.display = "none";
+        renderChips(); renderShops();
+        return;
+    }
+
+    const btn = e.target.closest("button[data-action='open']");
+    if (!btn) return;
+    window.location.href = "shop.html?id=" + encodeURIComponent(btn.dataset.id);
+});
+
+/* =========================================================
+   THEME
+   ========================================================= */
+function syncThemeButton() {
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    $("themeBtn").textContent = dark ? "Light" : "Dark";
+}
+$("themeBtn").addEventListener("click", () => {
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    if (dark) document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", "dark");
+    try { localStorage.setItem("goodBitesTheme", dark ? "light" : "dark"); } catch (e) {}
+    syncThemeButton();
+});
+syncThemeButton();
+
+/* =========================================================
+   START
+   ========================================================= */
+shops = loadShops();
+renderAll();
+GB.init();
+GB.pullAll().then(() => { shops = loadShops(); renderAll(); });
+</script>
+</body>
+</html>

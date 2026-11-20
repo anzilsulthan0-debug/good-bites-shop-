@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#b8891f">
+<title>Good Bites - Shop</title>
+ 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+ 
+<script>
+/* Apply saved theme before paint (same key the other Good Bites pages use) */
+(function () {
+    try {
+        if (localStorage.getItem("goodBitesTheme") === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+        }
+    } catch (e) {}
+})();
+</script>
+ 
+<style>
+:root {
+    --bg:#fbf8f1;
+    --surface:#ffffff;
+    --surface-2:#faf5e8;
+    --ink:#2b2416;
+    --muted:#7d735e;
+    --line:#ece3cc;
+    --gold:#b8891f;
+    --gold-2:#e2bf62;
+    --gold-soft:#f6ecd0;
+    --gold-ink:#8a6414;
+    --green:#16834d;
+    --green-soft:#e3f4ea;
+    --red:#c0392b;
+    --red-soft:#fdecea;
+    --amber:#b4631b;
+    --amber-soft:#fff0e1;
+    --shadow:0 1px 2px rgba(60,44,10,.06), 0 8px 24px rgba(60,44,10,.06);
+    --radius:16px;
+    --font:'Manrope', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+    --display:'Fraunces', Georgia, serif;
+}
+ 
+[data-theme="dark"] {
+    --bg:#101114;
+    --surface:#1a1c21;
+    --surface-2:#22242a;
+    --ink:#f3efe4;
+    --muted:#a7a192;
+    --line:#32343b;
+    --gold:#d9ac3f;
+    --gold-2:#f0cf7a;
+    --gold-soft:#332b17;
+    --gold-ink:#f0cf7a;
+    --green:#4cc98a;
+    --green-soft:#16301f;
+    --red:#ff8b7d;
+    --red-soft:#3a2321;
+    --amber:#f0a45e;
+    --amber-soft:#36271a;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+}
+ 
+* { box-sizing:border-box; margin:0; padding:0; }
+ 
+html { scroll-behavior:smooth; }
+ 
+body {
+    font-family:var(--font);
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:env(safe-area-inset-bottom);
+}
+ 
+button, input, select { font:inherit; color:inherit; }
+button { cursor:pointer; }
+ 
+:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+ 
+/* ---------- Top bar ---------- */
+.topbar {
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:12px clamp(14px, 4vw, 36px);
+    padding-top:calc(12px + env(safe-area-inset-top));
+    background:color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter:saturate(1.4) blur(14px);
+    -webkit-backdrop-filter:saturate(1.4) blur(14px);
+    border-bottom:1px solid var(--line);
+}
+ 
+.brand { display:flex; align-items:center; gap:10px; min-width:0; }
+.brand img { width:44px; height:44px; object-fit:contain; flex-shrink:0; }
+.brand h2 { font-family:var(--display); font-size:20px; font-weight:700; letter-spacing:-.01em; white-space:nowrap; }
+.brand h2 span { color:var(--gold); }
+.brand small { display:block; font-size:11px; color:var(--muted); font-weight:600; }
+ 
+.top-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+ 
+.btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    border:1px solid var(--line); background:var(--surface); color:var(--ink);
+    padding:9px 14px; border-radius:10px; font-weight:700; font-size:13px;
+    transition:background .15s, border-color .15s, transform .1s;
+}
+.btn:hover { background:var(--surface-2); border-color:var(--gold-2); }
+.btn:active { transform:translateY(1px); }
+.btn-primary { background:linear-gradient(135deg, var(--gold), var(--gold-2)); color:#fff; border-color:transparent; }
+.btn-primary:hover { background:linear-gradient(135deg, var(--gold), var(--gold-2)); filter:brightness(.95); border-color:transparent; }
+.btn-danger { color:var(--red); background:var(--red-soft); border-color:transparent; }
+.btn-danger:hover { background:var(--red-soft); filter:brightness(.97); border-color:var(--red); }
+.btn-good { color:var(--green); background:var(--green-soft); border-color:transparent; }
+.btn-good:hover { background:var(--green-soft); filter:brightness(.97); border-color:var(--green); }
+.btn-sm { padding:7px 11px; font-size:12px; border-radius:8px; }
+.btn[hidden] { display:none; }
+ 
+/* Live status */
+.live {
+    display:inline-flex; align-items:center; gap:7px;
+    padding:7px 12px; border-radius:999px; font-size:12px; font-weight:700;
+    background:var(--surface-2); border:1px solid var(--line); color:var(--muted);
+}
+.live i { width:8px; height:8px; border-radius:50%; background:var(--muted); display:block; }
+.live.on { color:var(--green); background:var(--green-soft); border-color:transparent; }
+.live.on i { background:var(--green); animation:pulse 1.8s ease-out infinite; }
+.live.wait i { background:var(--amber); }
+ 
+@keyframes pulse {
+    0% { box-shadow:0 0 0 0 color-mix(in srgb, var(--green) 55%, transparent); }
+    100% { box-shadow:0 0 0 8px transparent; }
+}
+ 
+/* ---------- Layout ---------- */
+.wrap { max-width:1120px; margin:0 auto; padding:clamp(16px, 3vw, 32px) clamp(14px, 4vw, 36px) 40px; }
+ 
+/* Shop hero */
+.hero {
+    display:grid; grid-template-columns:minmax(0, 340px) 1fr; gap:0;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    overflow:hidden; box-shadow:var(--shadow); margin-bottom:18px;
+}
+.hero-img {
+    background:var(--gold-soft); display:flex; align-items:center; justify-content:center;
+    min-height:220px; font-size:64px; overflow:hidden;
+}
+.hero-img img { width:100%; height:100%; object-fit:cover; display:block; }
+.hero-text { padding:clamp(18px, 3vw, 30px); display:flex; flex-direction:column; justify-content:center; gap:8px; min-width:0; }
+.hero-text h1 { font-family:var(--display); font-size:clamp(26px, 4vw, 38px); line-height:1.15; letter-spacing:-.02em; overflow-wrap:anywhere; }
+.hero-text p { color:var(--muted); font-size:15px; max-width:60ch; overflow-wrap:anywhere; }
+ 
+/* Stats */
+.stats { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:12px; margin-bottom:18px; }
+.stat {
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:14px 16px; min-width:0;
+}
+.stat span { display:block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:4px; }
+.stat strong { font-size:clamp(19px, 2.4vw, 25px); font-weight:800; letter-spacing:-.01em; overflow-wrap:anywhere; }
+.stat.gold strong { color:var(--gold-ink); }
+.stat.green strong { color:var(--green); }
+.stat.red strong { color:var(--red); }
+ 
+/* Panel */
+.panel {
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:clamp(16px, 2.5vw, 26px); box-shadow:var(--shadow);
+}
+.panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+.panel-head h2 { font-family:var(--display); font-size:24px; letter-spacing:-.01em; }
+.panel-head p { font-size:13px; color:var(--muted); }
+ 
+.role-note {
+    display:none; background:var(--gold-soft); color:var(--gold-ink);
+    padding:11px 14px; border-radius:10px; font-size:13px; font-weight:600; margin-bottom:14px;
+}
+ 
+/* Form */
+.form-box {
+    display:none; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:14px; padding:clamp(14px, 2.5vw, 22px); margin-bottom:18px;
+}
+.form-box.show { display:block; animation:drop .22s ease-out; }
+@keyframes drop { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+ 
+.form-box h3 { font-size:17px; margin-bottom:2px; }
+.form-box > p { font-size:13px; color:var(--muted); margin-bottom:16px; }
+ 
+.grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px; }
+.field { min-width:0; }
+.field label { display:block; font-size:12px; font-weight:700; color:var(--muted); margin-bottom:6px; }
+.field input, .field select {
+    width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:10px;
+    background:var(--surface); outline:none; min-width:0;
+    transition:border-color .15s, box-shadow .15s;
+}
+.field input:focus, .field select:focus { border-color:var(--gold); box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 22%, transparent); }
+.field input[readonly] { background:var(--gold-soft); color:var(--gold-ink); font-weight:700; }
+ 
+.total-row {
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    margin-top:16px; padding:14px 16px; border-radius:12px;
+    background:var(--gold-soft); color:var(--gold-ink); font-weight:700;
+}
+.total-row strong { font-size:24px; font-weight:800; }
+ 
+.form-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:16px; }
+ 
+/* Toolbar */
+.toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+.search { flex:1 1 220px; min-width:0; }
+.search input {
+    width:100%; padding:10px 14px; border:1px solid var(--line); border-radius:999px;
+    background:var(--surface-2); outline:none;
+}
+.search input:focus { border-color:var(--gold); }
+.chips { display:flex; gap:6px; }
+.chip {
+    padding:8px 13px; border-radius:999px; border:1px solid var(--line); background:var(--surface);
+    font-size:12px; font-weight:700; color:var(--muted);
+}
+.chip[aria-pressed="true"] { background:var(--gold); border-color:var(--gold); color:#fff; }
+ 
+/* Receipt cards */
+.list { display:grid; gap:12px; }
+ 
+.rcpt {
+    display:grid; grid-template-columns:minmax(0, 1.1fr) minmax(0, 1fr) auto; gap:18px; align-items:center;
+    border:1px solid var(--line); border-radius:14px; padding:16px 18px; background:var(--surface);
+    transition:border-color .15s, box-shadow .15s;
+}
+.rcpt:hover { border-color:var(--gold-2); box-shadow:var(--shadow); }
+.rcpt.flash { animation:flash 1.6s ease-out; }
+@keyframes flash { 0% { background:var(--gold-soft); } 100% { background:var(--surface); } }
+ 
+.rcpt h3 { font-size:15px; font-weight:800; margin-bottom:6px; overflow-wrap:anywhere; }
+.meta { display:flex; flex-wrap:wrap; gap:6px 12px; font-size:12px; color:var(--muted); }
+.tag {
+    display:inline-block; padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
+    background:var(--gold-soft); color:var(--gold-ink);
+}
+ 
+.progress { min-width:0; }
+.prog-top { display:flex; justify-content:space-between; gap:8px; font-size:12px; font-weight:700; margin-bottom:7px; }
+.prog-top .pending { color:var(--red); }
+.prog-top .given { color:var(--green); }
+.track { height:8px; background:var(--line); border-radius:99px; overflow:hidden; }
+.fill { height:100%; background:linear-gradient(90deg, var(--green), #54bd7c); border-radius:99px; transition:width .35s ease; }
+.prog-bot { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:6px; }
+ 
+.status { display:inline-block; margin-top:8px; padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700; }
+.status.pending { background:var(--amber-soft); color:var(--amber); }
+.status.done { background:var(--green-soft); color:var(--green); }
+ 
+.side { display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+.amount { font-size:20px; font-weight:800; color:var(--gold-ink); white-space:nowrap; }
+.actions { display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; }
+ 
+.empty {
+    text-align:center; padding:38px 16px; border:1px dashed var(--line); border-radius:14px;
+    color:var(--muted); background:var(--surface-2);
+}
+ 
+/* Dialog */
+dialog {
+    border:1px solid var(--line); border-radius:18px; padding:0; background:var(--surface); color:var(--ink);
+    box-shadow:0 24px 70px rgba(0,0,0,.3); width:min(420px, calc(100vw - 28px)); margin:auto;
+}
+dialog::backdrop { background:rgba(20,14,4,.5); backdrop-filter:blur(3px); }
+.dlg { padding:22px; }
+.dlg h3 { font-size:18px; margin-bottom:4px; }
+.dlg p { font-size:13px; color:var(--muted); margin-bottom:14px; }
+.dlg-stats { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:14px; }
+.dlg-stats div { background:var(--surface-2); border-radius:10px; padding:9px; text-align:center; }
+.dlg-stats span { display:block; font-size:11px; color:var(--muted); font-weight:600; }
+.dlg-stats strong { font-size:18px; }
+.quick { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+.dlg-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
+ 
+/* Toast */
+#toasts { position:fixed; left:50%; bottom:calc(18px + env(safe-area-inset-bottom)); transform:translateX(-50%); display:grid; gap:8px; z-index:200; width:min(380px, calc(100vw - 28px)); }
+.toast {
+    background:var(--ink); color:var(--bg); padding:11px 16px; border-radius:12px; font-size:13px; font-weight:600;
+    box-shadow:0 10px 30px rgba(0,0,0,.25); animation:drop .2s ease-out;
+}
+.toast.error { background:var(--red); color:#fff; }
+.toast.live-update { background:var(--gold); color:#fff; }
+ 
+.footer { text-align:center; font-size:12px; color:var(--muted); padding:22px 0 6px; }
+ 
+#printReceipt { display:none; }
+ 
+/* ---------- Responsive ---------- */
+@media (max-width:900px) {
+    .stats { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .rcpt { grid-template-columns:1fr; gap:14px; }
+    .side { flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .actions { justify-content:flex-start; }
+}
+@media (max-width:700px) {
+    .hero { grid-template-columns:1fr; }
+    .hero-img { min-height:190px; max-height:240px; }
+    .grid { grid-template-columns:1fr 1fr; }
+}
+@media (max-width:520px) {
+    .brand small { display:none; }
+    .brand h2 { font-size:17px; }
+    .brand img { width:38px; height:38px; }
+    .btn { padding:8px 10px; font-size:12px; }
+    .grid { grid-template-columns:1fr; }
+    .form-actions { flex-direction:column-reverse; }
+    .form-actions .btn { width:100%; }
+    .panel-head .btn-primary { width:100%; }
+}
+@media (prefers-reduced-motion:reduce) {
+    *, *::before, *::after { animation:none !important; transition:none !important; }
+}
+ 
+/* ---------- Print ---------- */
+@media print {
+    body { background:#fff; }
+    body * { visibility:hidden; }
+    #printReceipt, #printReceipt * { visibility:visible; }
+    #printReceipt { display:block !important; position:absolute; left:0; top:0; width:100%; padding:25px; color:#000; font-family:Arial, sans-serif; }
+    .print-heading { text-align:center; margin-bottom:25px; }
+    .print-heading h1 { font-size:25px; margin-bottom:8px; }
+    .print-line { border-top:1px dashed #555; margin:15px 0; }
+    .print-row { display:flex; justify-content:space-between; gap:15px; padding:9px 0; font-size:14px; }
+}
+</style>
+</head>
+ 
+<body>
+ 
+<header class="topbar">
+    <div class="brand">
+        <img src="logo.png" alt="Good Bites logo">
+        <div>
+            <h2>Good<span>Bites</span></h2>
+            <small>Shop management</small>
+        </div>
+    </div>
+ 
+    <div class="top-actions">
+        <span class="live wait" id="livePill" role="status" aria-live="polite"><i></i><b id="liveText">Connecting</b></span>
+        <button class="btn" id="themeBtn" type="button" aria-label="Toggle dark mode">Dark</button>
+        <button class="btn" id="backBtn" type="button">All shops</button>
+        <button class="btn btn-danger" id="logoutBtn" type="button">Logout</button>
+    </div>
+</header>
+ 
+<main class="wrap">
+ 
+    <section class="hero">
+        <div class="hero-img" id="shopImage" aria-hidden="true">🏪</div>
+        <div class="hero-text">
+            <h1 id="shopName">Loading shop…</h1>
+            <p id="shopDescription">Loading shop information…</p>
+        </div>
+    </section>
+ 
+    <section class="stats" aria-label="Shop summary">
+        <div class="stat"><span>Receipts</span><strong id="stReceipts">0</strong></div>
+        <div class="stat gold"><span>Total sales</span><strong id="stSales">₹0.00</strong></div>
+        <div class="stat green"><span>Pieces given</span><strong id="stGiven">0</strong></div>
+        <div class="stat red"><span>Pieces pending</span><strong id="stPending">0</strong></div>
+    </section>
+ 
+    <section class="panel">
+        <div class="panel-head">
+            <div>
+                <h2>Receipts</h2>
+                <p id="receiptCount">0 receipts</p>
+            </div>
+            <button class="btn btn-primary" id="addReceiptBtn" type="button" hidden>New receipt</button>
+        </div>
+ 
+        <div class="role-note" id="roleNote">
+            You can view and print receipts. Only an admin can create receipts, update given pieces or delete receipts.
+        </div>
+ 
+        <div class="form-box" id="receiptFormBox">
+            <h3>New receipt</h3>
+            <p>Enter the purchase and product details.</p>
+ 
+            <form id="receiptForm" autocomplete="off">
+                <div class="grid">
+                    <div class="field">
+                        <label for="receiptNumber">Receipt number</label>
+                        <input type="text" id="receiptNumber" readonly>
+                    </div>
+                    <div class="field">
+                        <label for="receiptShopName">Shop</label>
+                        <input type="text" id="receiptShopName" readonly>
+                    </div>
+                    <div class="field">
+                        <label for="receiptDate">Date</label>
+                        <input type="date" id="receiptDate" required>
+                    </div>
+                    <div class="field">
+                        <label for="customerName">Purchase number</label>
+                        <input type="text" id="customerName" maxlength="100" placeholder="Enter purchase number" required>
+                    </div>
+                    <div class="field">
+                        <label for="productName">Product</label>
+                        <select id="productName" required>
+                            <option value="">Select product</option>
+                            <option value="Quail Egg">Quail Egg</option>
+                            <option value="Egg Pickle">Egg Pickle</option>
+                            <option value="Nuts">Nuts</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="price">Price per piece (₹)</label>
+                        <input type="number" id="price" min="0" step="0.01" inputmode="decimal" placeholder="0.00" required>
+                    </div>
+                    <div class="field">
+                        <label for="quantity">Pieces</label>
+                        <input type="number" id="quantity" min="1" step="1" value="1" inputmode="numeric" required>
+                    </div>
+                </div>
+ 
+                <div class="total-row">
+                    <span>Total amount</span>
+                    <strong id="totalDisplay">₹0.00</strong>
+                </div>
+ 
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancelReceiptBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveReceiptBtn">Save receipt</button>
+                </div>
+            </form>
+        </div>
+ 
+        <div class="toolbar">
+            <div class="search">
+                <input type="search" id="searchInput" placeholder="Search receipt, purchase number or product" aria-label="Search receipts">
+            </div>
+            <div class="chips" role="group" aria-label="Filter receipts">
+                <button class="chip" type="button" data-filter="all" aria-pressed="true">All</button>
+                <button class="chip" type="button" data-filter="pending" aria-pressed="false">Pending</button>
+                <button class="chip" type="button" data-filter="done" aria-pressed="false">Completed</button>
+            </div>
+        </div>
+ 
+        <div class="list" id="receiptList">
+            <div class="empty">Loading receipts…</div>
+        </div>
+    </section>
+ 
+    <footer class="footer">© 2026 Business Manager. All rights reserved.</footer>
+</main>
+ 
+<!-- Update given pieces -->
+<dialog id="givenDialog">
+    <form method="dialog" class="dlg" id="givenForm">
+        <h3 id="gdTitle">Update given pieces</h3>
+        <p id="gdSub"></p>
+        <div class="dlg-stats">
+            <div><span>Total</span><strong id="gdTotal">0</strong></div>
+            <div><span>Given</span><strong id="gdGiven">0</strong></div>
+            <div><span>Pending</span><strong id="gdPending">0</strong></div>
+        </div>
+        <div class="field">
+            <label for="gdInput">Total pieces given so far</label>
+            <input type="number" id="gdInput" min="0" step="1" inputmode="numeric">
+        </div>
+        <div class="quick">
+            <button type="button" class="btn btn-sm" data-quick="-1">−1</button>
+            <button type="button" class="btn btn-sm" data-quick="1">+1</button>
+            <button type="button" class="btn btn-sm" data-quick="10">+10</button>
+            <button type="button" class="btn btn-sm btn-good" data-quick="all">All given</button>
+            <button type="button" class="btn btn-sm" data-quick="zero">Reset</button>
+        </div>
+        <div class="dlg-actions">
+            <button type="button" class="btn" id="gdCancel">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+</dialog>
+ 
+<!-- Delete confirmation -->
+<dialog id="deleteDialog">
+    <form method="dialog" class="dlg" id="deleteForm">
+        <h3>Delete receipt?</h3>
+        <p id="delText"></p>
+        <div class="dlg-actions">
+            <button type="button" class="btn" id="delCancel">Keep receipt</button>
+            <button type="submit" class="btn btn-danger">Delete receipt</button>
+        </div>
+    </form>
+</dialog>
+ 
+<div id="toasts" aria-live="polite"></div>
+<div id="printReceipt"></div>
+ 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="sync.js"></script>
+
+<script>
+const SHOPS_KEY = "businessManagerDemoShops";
+ 
+/* =========================================================
+   LOGIN SESSION CHECK
+   ========================================================= */
+let currentSession = null;
+try {
+    const raw = sessionStorage.getItem("businessManagerSession");
+    currentSession = raw ? JSON.parse(raw) : null;
+} catch (e) { currentSession = null; }
+ 
+if (!currentSession || currentSession.loggedIn !== true || !currentSession.username) {
+    window.location.replace("login.html");
+    throw new Error("Login required");
+}
+ 
+const ADMIN_ROLES = ["Administrator", "Super Admin", "admin", "superadmin"];
+const isAdmin = ADMIN_ROLES.includes(currentSession.role);
+ 
+/* =========================================================
+   SMALL HELPERS
+   ========================================================= */
+const $ = id => document.getElementById(id);
+ 
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+    })[c]);
+}
+ 
+function money(n) {
+    return "₹" + (Number(n) || 0).toLocaleString("en-IN", { minimumFractionDigits:2, maximumFractionDigits:2 });
+}
+ 
+function toast(message, kind = "") {
+    const el = document.createElement("div");
+    el.className = "toast " + kind;
+    el.textContent = message;
+    $("toasts").appendChild(el);
+    setTimeout(() => el.remove(), 3200);
+}
+ 
+function setLive(state) {
+    const pill = $("livePill");
+    pill.className = "live " + state;
+    $("liveText").textContent =
+        state === "on" ? "Live" :
+        state === "wait" ? "Connecting" : "Local only";
+}
+ 
+/* =========================================================
+   STORAGE LAYER
+   localStorage is the offline copy; Supabase is the shared copy.
+   ========================================================= */
+const store = window.GBStore;
+store.onStatus = setLive;
+
+/* =========================================================
+   STATE
+   ========================================================= */
+let currentShop = null;
+let RECEIPT_KEY = "";
+let receipts = [];
+let filter = "all";
+let query = "";
+let flashId = null;
+ 
+function pieceData(r) {
+    const total = Math.max(0, Number(r.quantity) || 0);
+    const given = Math.max(0, Math.min(total, Number(r.givenQuantity) || 0));
+    const pending = total - given;
+    const percent = total > 0 ? Math.round((given / total) * 100) : 0;
+    return { total, given, pending, percent };
+}
+ 
+function nextReceiptNumber(list) {
+    let next = 1;
+    list.forEach(r => {
+        const m = String(r.receiptNumber || "").match(/-(\d+)$/);
+        if (m) next = Math.max(next, Number(m[1]) + 1);
+    });
+    return "REC-" + String(currentShop.id).padStart(2, "0") + "-" + String(next).padStart(4, "0");
+}
+ 
+/* Every change: read the newest list, apply the change, save.
+   This stops two admins from overwriting each other's work. */
+async function mutate(change) {
+    const latest = await store.get(RECEIPT_KEY);
+    const base = Array.isArray(latest) ? latest.map(r => ({ ...r })) : [];
+    const next = change(base);
+    await store.set(RECEIPT_KEY, next);
+    receipts = next;
+    render();
+}
+ 
+function onRemote(list) {
+    if (!Array.isArray(list)) return;
+    if (JSON.stringify(list) === JSON.stringify(receipts)) return;   // our own change echoing back
+ 
+    const oldIds = new Set(receipts.map(r => r.id));
+    const added = list.find(r => !oldIds.has(r.id));
+    flashId = added ? added.id : null;
+ 
+    receipts = list;
+    render();
+    toast("Receipts updated live", "live-update");
+}
+ 
+/* =========================================================
+   RENDER
+   ========================================================= */
+function render() {
+    /* Summary */
+    let sales = 0, given = 0, pending = 0;
+    receipts.forEach(r => {
+        const p = pieceData(r);
+        sales += (Number(r.price) || 0) * p.total;
+        given += p.given;
+        pending += p.pending;
+    });
+    $("stReceipts").textContent = receipts.length;
+    $("stSales").textContent = money(sales);
+    $("stGiven").textContent = given;
+    $("stPending").textContent = pending;
+ 
+    /* Filter + search */
+    const q = query.trim().toLowerCase();
+    const shown = receipts.slice().reverse().filter(r => {
+        const p = pieceData(r);
+        if (filter === "pending" && p.pending === 0) return false;
+        if (filter === "done" && p.pending > 0) return false;
+        if (!q) return true;
+        return [r.receiptNumber, r.customerName, r.productName, r.date]
+            .some(v => String(v || "").toLowerCase().includes(q));
+    });
+ 
+    $("receiptCount").textContent =
+        shown.length === receipts.length
+            ? receipts.length + (receipts.length === 1 ? " receipt" : " receipts")
+            : shown.length + " of " + receipts.length + " receipts";
+ 
+    const list = $("receiptList");
+ 
+    if (!shown.length) {
+        list.innerHTML = `<div class="empty">${
+            receipts.length ? "No receipts match your search or filter." :
+            isAdmin ? "No receipts yet. Select New receipt to add the first one." : "No receipts for this shop yet."
+        }</div>`;
+        return;
+    }
+ 
+    list.innerHTML = shown.map(r => {
+        const p = pieceData(r);
+        const done = p.pending === 0;
+        const id = escapeHTML(r.id);
+ 
+        return `
+        <article class="rcpt ${r.id === flashId ? "flash" : ""}">
+            <div>
+                <h3>${escapeHTML(r.receiptNumber)}</h3>
+                <div class="meta">
+                    <span class="tag">${escapeHTML(r.productName)}</span>
+                    <span>Purchase ${escapeHTML(r.customerName)}</span>
+                    <span>${escapeHTML(r.date)}</span>
+                    <span>${money(r.price)} per piece</span>
+                </div>
+                <span class="status ${done ? "done" : "pending"}">${done ? "All pieces given" : "Pieces pending"}</span>
+            </div>
+ 
+            <div class="progress">
+                <div class="prog-top">
+                    <span class="given">${p.given} given</span>
+                    <span class="pending">${p.pending} pending</span>
+                </div>
+                <div class="track"><div class="fill" style="width:${p.percent}%"></div></div>
+                <div class="prog-bot"><span>${p.percent}% complete</span><span>${p.given} of ${p.total}</span></div>
+            </div>
+ 
+            <div class="side">
+                <div class="amount">${money(p.total * (Number(r.price) || 0))}</div>
+                <div class="actions">
+                    <button class="btn btn-sm" type="button" data-print="${id}">Print</button>
+                    ${isAdmin ? `
+                        <button class="btn btn-sm ${done ? "" : "btn-good"}" type="button" data-status="${id}" data-to="${done ? "pending" : "done"}">${done ? "Mark pending" : "Mark completed"}</button>
+                        <button class="btn btn-sm btn-good" type="button" data-given="${id}">Update given</button>
+                        <button class="btn btn-sm btn-danger" type="button" data-delete="${id}">Delete</button>` : ""}
+                </div>
+            </div>
+        </article>`;
+    }).join("");
+ 
+    flashId = null;
+}
+ 
+/* =========================================================
+   FORM
+   ========================================================= */
+const form = $("receiptForm");
+const qtyInput = $("quantity");
+const priceInput = $("price");
+ 
+function updateTotal() {
+    const total = (Number(qtyInput.value) || 0) * (Number(priceInput.value) || 0);
+    $("totalDisplay").textContent = money(total);
+}
+qtyInput.addEventListener("input", updateTotal);
+priceInput.addEventListener("input", updateTotal);
+ 
+function localDateString() {
+    const d = new Date();
+    return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, "0"), String(d.getDate()).padStart(2, "0")].join("-");
+}
+ 
+$("addReceiptBtn").addEventListener("click", () => {
+    if (!isAdmin) return toast("Only an admin can add receipts.", "error");
+    form.reset();
+    $("receiptNumber").value = nextReceiptNumber(receipts);
+    $("receiptShopName").value = currentShop.name;
+    $("receiptDate").value = localDateString();
+    qtyInput.value = 1;
+    updateTotal();
+    $("receiptFormBox").classList.add("show");
+    $("customerName").focus({ preventScroll:true });
+    $("receiptFormBox").scrollIntoView({ behavior:"smooth", block:"start" });
+});
+ 
+$("cancelReceiptBtn").addEventListener("click", () => {
+    form.reset();
+    $("receiptFormBox").classList.remove("show");
+    updateTotal();
+});
+ 
+form.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!isAdmin) return toast("Only an admin can add receipts.", "error");
+ 
+    const customerName = $("customerName").value.trim();
+    const productName = $("productName").value.trim();
+    const date = $("receiptDate").value;
+    const quantity = Number(qtyInput.value);
+    const price = Number(priceInput.value);
+ 
+    if (!customerName || !productName || !date) return toast("Please fill all required fields.", "error");
+    if (!Number.isSafeInteger(quantity) || quantity < 1 || !Number.isFinite(price) || price < 0) {
+        return toast("Enter a valid quantity and price.", "error");
+    }
+ 
+    const total = quantity * price;
+    if (!Number.isFinite(total) || total > Number.MAX_SAFE_INTEGER) return toast("Total amount is too large.", "error");
+ 
+    const btn = $("saveReceiptBtn");
+    btn.disabled = true;
+ 
+    try {
+        const newId = Date.now().toString();
+        await mutate(list => {
+            list.push({
+                id: newId,
+                receiptNumber: nextReceiptNumber(list),
+                shopId: currentShop.id,
+                shopName: currentShop.name,
+                customerName, date, productName, quantity,
+                givenQuantity: 0,
+                price, total,
+                createdBy: currentSession.username
+            });
+            return list;
+        });
+        flashId = newId;
+        render();
+        form.reset();
+        $("receiptFormBox").classList.remove("show");
+        updateTotal();
+        toast("Receipt saved");
+    } catch (err) {
+        console.error(err);
+        toast("Could not save the receipt. " + (err.message || ""), "error");
+    } finally {
+        btn.disabled = false;
+    }
+});
+ 
+/* =========================================================
+   GIVEN PIECES DIALOG
+   ========================================================= */
+const givenDialog = $("givenDialog");
+let givenTarget = null;
+ 
+function openGiven(id) {
+    if (!isAdmin) return toast("Only an admin can update given pieces.", "error");
+    const r = receipts.find(x => String(x.id) === String(id));
+    if (!r) return;
+    givenTarget = { id: r.id, total: pieceData(r).total };
+    const p = pieceData(r);
+    $("gdSub").textContent = r.receiptNumber + " · " + r.productName;
+    $("gdTotal").textContent = p.total;
+    $("gdGiven").textContent = p.given;
+    $("gdPending").textContent = p.pending;
+    const input = $("gdInput");
+    input.max = p.total;
+    input.value = p.given;
+    givenDialog.showModal();
+    input.select();
+}
+ 
+givenDialog.addEventListener("click", e => {
+    const btn = e.target.closest("[data-quick]");
+    if (!btn || !givenTarget) return;
+    const input = $("gdInput");
+    const current = Number(input.value) || 0;
+    const q = btn.dataset.quick;
+    let next = current;
+    if (q === "all") next = givenTarget.total;
+    else if (q === "zero") next = 0;
+    else next = current + Number(q);
+    input.value = Math.max(0, Math.min(givenTarget.total, next));
+});
+ 
+$("gdCancel").addEventListener("click", () => givenDialog.close());
+ 
+$("givenForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!givenTarget) return;
+    const value = Number($("gdInput").value);
+    if (!Number.isSafeInteger(value) || value < 0 || value > givenTarget.total) {
+        return toast("Enter a whole number from 0 to " + givenTarget.total + ".", "error");
+    }
+    const id = givenTarget.id;
+    givenDialog.close();
+    try {
+        await mutate(list => {
+            const r = list.find(x => String(x.id) === String(id));
+            if (!r) throw new Error("This receipt no longer exists.");
+            r.givenQuantity = value;
+            return list;
+        });
+        toast("Given pieces updated");
+    } catch (err) {
+        toast("Could not update. " + (err.message || ""), "error");
+    }
+});
+ 
+/* =========================================================
+   DELETE DIALOG
+   ========================================================= */
+const deleteDialog = $("deleteDialog");
+let deleteId = null;
+ 
+function openDelete(id) {
+    if (!isAdmin) return toast("Only an admin can delete receipts.", "error");
+    const r = receipts.find(x => String(x.id) === String(id));
+    if (!r) return;
+    deleteId = r.id;
+    $("delText").textContent = r.receiptNumber + " will be removed for everyone. This cannot be undone.";
+    deleteDialog.showModal();
+}
+ 
+$("delCancel").addEventListener("click", () => deleteDialog.close());
+ 
+$("deleteForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const id = deleteId;
+    deleteDialog.close();
+    try {
+        await mutate(list => list.filter(x => String(x.id) !== String(id)));
+        toast("Receipt deleted");
+    } catch (err) {
+        toast("Could not delete. " + (err.message || ""), "error");
+    }
+});
+ 
+/* =========================================================
+   LIST ACTIONS, SEARCH, FILTERS
+   ========================================================= */
+/* Admin only: switch a receipt between Pending and Completed.
+   Completed = every piece given. Pending = nothing given yet
+   (use "Update given" afterwards for a partial amount). */
+async function setStatus(id, to) {
+    if (!isAdmin) return toast("Only an admin can change the status.", "error");
+    try {
+        await mutate(list => {
+            const r = list.find(x => String(x.id) === String(id));
+            if (!r) throw new Error("This receipt no longer exists.");
+            r.givenQuantity = to === "done" ? pieceData(r).total : 0;
+            return list;
+        });
+        toast(to === "done" ? "Marked as completed" : "Marked as pending");
+    } catch (err) {
+        toast("Could not change status. " + (err.message || ""), "error");
+    }
+}
+ 
+$("receiptList").addEventListener("click", e => {
+    const s = e.target.closest("[data-status]");
+    if (s) return setStatus(s.dataset.status, s.dataset.to);
+ 
+    const g = e.target.closest("[data-given]");
+    if (g) return openGiven(g.dataset.given);
+ 
+    const d = e.target.closest("[data-delete]");
+    if (d) return openDelete(d.dataset.delete);
+ 
+    const p = e.target.closest("[data-print]");
+    if (p) {
+        const r = receipts.find(x => String(x.id) === p.dataset.print);
+        if (r) printReceipt(r);
+    }
+});
+ 
+$("searchInput").addEventListener("input", e => { query = e.target.value; render(); });
+ 
+document.querySelectorAll(".chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+        filter = chip.dataset.filter;
+        document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", String(c === chip)));
+        render();
+    });
+});
+ 
+/* =========================================================
+   PRINT
+   ========================================================= */
+function printReceipt(r) {
+    const p = pieceData(r);
+    const price = Number(r.price) || 0;
+    const row = (label, value) => `<div class="print-row"><span>${label}</span><strong>${value}</strong></div>`;
+ 
+    $("printReceipt").innerHTML = `
+        <div class="print-heading"><h1>${escapeHTML(r.shopName)}</h1><p>Customer receipt</p></div>
+        <div class="print-line"></div>
+        ${row("Receipt number", escapeHTML(r.receiptNumber))}
+        ${row("Date", escapeHTML(r.date))}
+        ${row("Purchase number", escapeHTML(r.customerName))}
+        <div class="print-line"></div>
+        ${row("Product", escapeHTML(r.productName))}
+        ${row("Price per piece", money(price))}
+        ${row("Total pieces", p.total + " pieces")}
+        ${row("Given pieces", p.given + " pieces")}
+        ${row("Pending pieces", p.pending + " pieces")}
+        <div class="print-line"></div>
+        ${row("Total amount", money(p.total * price))}
+        <div class="print-line"></div>
+        <div style="text-align:center;margin-top:30px;">Thank you!</div>`;
+    window.print();
+}
+ 
+/* =========================================================
+   HEADER BUTTONS + THEME
+   ========================================================= */
+$("backBtn").addEventListener("click", () => { window.location.href = isAdmin ? "admin.html" : "index.html"; });
+ 
+$("logoutBtn").addEventListener("click", () => {
+    ["businessManagerSession", "businessManagerRole", "businessManagerUser"]
+        .forEach(k => sessionStorage.removeItem(k));
+    window.location.replace("login.html");
+});
+ 
+function syncThemeButton() {
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    $("themeBtn").textContent = dark ? "Light" : "Dark";
+}
+$("themeBtn").addEventListener("click", () => {
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    if (dark) document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", "dark");
+    try { localStorage.setItem("goodBitesTheme", dark ? "light" : "dark"); } catch (e) {}
+    syncThemeButton();
+});
+syncThemeButton();
+ 
+/* Role UI */
+if (isAdmin) $("addReceiptBtn").hidden = false;
+else $("roleNote").style.display = "block";
+ 
+/* =========================================================
+   START
+   ========================================================= */
+(async function start() {
+    store.init();
+ 
+    const shopId = new URLSearchParams(window.location.search).get("id");
+    const shopsRaw = await store.get(SHOPS_KEY);
+    const shops = Array.isArray(shopsRaw) ? shopsRaw : [];
+    currentShop = shops.find(s => String(s.id) === String(shopId));
+ 
+    if (!currentShop) {
+        document.querySelector("main").innerHTML = `
+            <div class="panel" style="text-align:center;margin-top:40px">
+                <h2 style="font-family:var(--display)">Shop not found</h2>
+                <p style="color:var(--muted);margin:10px 0 18px">We could not find the shop you opened.</p>
+                <a class="btn btn-primary" href="index.html">Back to all shops</a>
+            </div>`;
+        setLive("off");
+        return;
+    }
+ 
+    document.title = "Good Bites — " + currentShop.name;
+    $("shopName").textContent = currentShop.name;
+    $("shopDescription").textContent = currentShop.description || "No description available.";
+ 
+    if (currentShop.image) {
+        const img = document.createElement("img");
+        img.src = currentShop.image;
+        img.alt = currentShop.name;
+        img.onerror = () => { img.remove(); $("shopImage").textContent = "🏪"; };
+        $("shopImage").replaceChildren(img);
+    }
+ 
+    RECEIPT_KEY = "businessManagerReceipts_" + currentShop.id;
+ 
+    const saved = await store.get(RECEIPT_KEY);
+    receipts = Array.isArray(saved) ? saved : [];
+    updateTotal();
+    render();
+ 
+    store.watch(key => key === RECEIPT_KEY, (key, value) => onRemote(Array.isArray(value) ? value : []));
+    store.pullAll();
+})();
+</script>
+</body>
+</html>

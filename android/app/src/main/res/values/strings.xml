@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Good Bites</string>
+    <string name="title_activity_main">Good Bites</string>
+    <string name="package_name">com.goodbites.app</string>
+    <string name="custom_url_scheme">com.goodbites.app</string>
+</resources>

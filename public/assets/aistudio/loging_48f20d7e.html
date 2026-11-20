@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#bd922f">
+
+<title>Good Bites - Login</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+/* Apply saved theme before first paint (same key as admin.html, index.html, shop.html) */
+(function () {
+    try {
+        if (localStorage.getItem("goodBitesTheme") === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+        }
+    } catch (e) {}
+})();
+</script>
+
+<style>
+:root {
+    --bg:#f0f2f5;
+    --card:rgba(255,255,255,.9);
+    --acc:#bd922f;
+    --acc2:#e6c66f;
+    --t1:#1a1a2e;
+    --t2:#444;
+    --t3:#888;
+    --brd:rgba(200,200,200,.4);
+    --shd:0 8px 32px rgba(0,0,0,.08);
+}
+
+[data-theme="dark"] {
+    --bg:#0f0f1a;
+    --card:rgba(30,30,50,.95);
+    --t1:#eee;
+    --t2:#bbb;
+    --t3:#888;
+    --brd:rgba(100,100,140,.3);
+    --shd:0 8px 32px rgba(0,0,0,.3);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+    font-family:'Poppins',sans-serif;
+    background:var(--bg);
+    color:var(--t1);
+    min-height:100vh;
+    transition:.3s;
+}
+
+button,input { font-family:inherit; }
+
+button {
+    cursor:pointer;
+    border:none;
+    border-radius:10px;
+    padding:11px 18px;
+    transition:.2s;
+}
+button:hover { opacity:.9; transform:translateY(-1px); }
+
+.btn-primary {
+    background:linear-gradient(135deg,var(--acc),var(--acc2));
+    color:white;
+    font-weight:600;
+}
+
+input {
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--brd);
+    border-radius:10px;
+    background:var(--card);
+    color:var(--t1);
+    outline:none;
+}
+input:focus { border-color:var(--acc); }
+
+.glass {
+    background:var(--card);
+    backdrop-filter:blur(12px);
+    border:1px solid var(--brd);
+    border-radius:18px;
+    box-shadow:var(--shd);
+}
+
+.login-container {
+    min-height:calc(100vh - 48px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.login-box { width:100%; max-width:420px; padding:35px; }
+
+.login-box h2 {
+    text-align:center;
+    color:var(--acc);
+    font-size:26px;
+    margin-bottom:5px;
+}
+
+.subtitle {
+    text-align:center;
+    color:var(--t3);
+    font-size:13px;
+    margin-bottom:25px;
+}
+
+.login-tabs {
+    display:flex;
+    border:1px solid var(--brd);
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:24px;
+}
+
+.login-tab {
+    flex:1;
+    text-align:center;
+    padding:12px 5px;
+    font-size:13px;
+    cursor:pointer;
+    color:var(--t2);
+}
+.login-tab.active { background:var(--acc); color:white; }
+
+.form-group { margin-bottom:15px; }
+.form-group label {
+    display:block;
+    margin-bottom:6px;
+    font-size:12px;
+    font-weight:600;
+    color:var(--t3);
+}
+
+.login-button { width:100%; margin-top:8px; }
+.login-button:disabled { opacity:.6; cursor:not-allowed; }
+
+.theme-toggle {
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:var(--brd);
+    color:var(--t1);
+    font-size:18px;
+    padding:0;
+}
+
+.app-footer {
+    height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--t3);
+    font-size:12px;
+}
+
+#toasts { position:fixed; top:15px; right:15px; z-index:9999; }
+.toast {
+    padding:12px 18px;
+    border-radius:10px;
+    color:white;
+    margin-bottom:8px;
+    background:#3498db;
+    font-size:13px;
+}
+.toast-success { background:#27ae60; }
+.toast-error { background:#e74c3c; }
+
+@media(max-width:600px) {
+    .login-box { padding:22px 17px; }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app"></div>
+<div id="toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="sync.js"></script>
+
+<script>
+/* =====================================
+   GOOD BITES CONFIGURATION
+===================================== */
+const CONFIG = {
+    eventName: "Good Bites",
+    orgName: "SHOP MANAGEMENT",
+    logo: "logo.png",
+
+    adminPass: "admin123",
+
+    defaultTeam: {
+        id: "team-haya",
+        name: "Haya",
+        loginId: "haya",
+        password: "haya@955"
+    },
+
+    teamStorageKey: "goodBitesTeams",
+    shopsStorageKey: "businessManagerDemoShops",   // same key as admin.html and index.html
+    themeKey: "goodBitesTheme"
+};
+
+/* =====================================
+   APPLICATION STATE
+===================================== */
+let S = {
+    theme: (function () {
+        try { return localStorage.getItem(CONFIG.themeKey) === "dark" ? "dark" : "light"; }
+        catch (e) { return "light"; }
+    })(),
+    teams: []
+};
+
+/* =====================================
+   SESSION (same format admin.html and index.html check)
+===================================== */
+function startSession(info) {
+    const session = {
+        loggedIn: true,
+        username: info.username,
+        role: info.role,
+        displayRole: info.displayRole,
+        shopId: info.shopId || null,
+        loginAt: new Date().toISOString()
+    };
+    sessionStorage.setItem("businessManagerSession", JSON.stringify(session));
+    sessionStorage.setItem("businessManagerRole", info.role);
+    sessionStorage.setItem("businessManagerUser", info.username);
+}
+
+/* If already signed in, go straight to the right page */
+(function redirectIfLoggedIn() {
+    try {
+        const raw = sessionStorage.getItem("businessManagerSession");
+        const s = raw ? JSON.parse(raw) : null;
+        if (s && s.loggedIn === true && s.username) {
+            const adminRoles = ["admin", "administrator", "super admin", "superadmin"];
+            if (adminRoles.includes(String(s.role || "").toLowerCase())) {
+                window.location.replace("admin.html");
+            } else {
+                window.location.replace("index.html");
+            }
+        }
+    } catch (e) {}
+})();
+
+/* =====================================
+   TEAMS
+===================================== */
+function loadTeams() {
+    try {
+        const saved = localStorage.getItem(CONFIG.teamStorageKey);
+        const parsed = saved ? JSON.parse(saved) : [];
+        S.teams = Array.isArray(parsed) ? parsed : [];
+
+        const hayaExists = S.teams.some(t =>
+            String(t.loginId || "").trim().toLowerCase() === "haya"
+        );
+        if (!hayaExists) {
+            S.teams.push({ ...CONFIG.defaultTeam });
+            saveTeams();
+        }
+    } catch (error) {
+        console.error("Team loading error:", error);
+        S.teams = [{ ...CONFIG.defaultTeam }];
+        saveTeams();
+    }
+}
+
+function saveTeams() {
+    try { localStorage.setItem(CONFIG.teamStorageKey, JSON.stringify(S.teams)); } catch (e) {}
+}
+
+/* Fetch the newest shop list (cloud if configured) into this device before checking logins */
+async function loadShopsShared() {
+    try {
+        window.GBStore.init();
+        await window.GBStore.get(window.GBStore.SHOPS_KEY);
+    } catch (e) {}
+}
+
+function loadShops() {
+    try {
+        const parsed = JSON.parse(localStorage.getItem(CONFIG.shopsStorageKey) || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (e) { return []; }
+}
+
+/* =====================================
+   TOAST
+===================================== */
+function toast(message, type = "info") {
+    const container = document.getElementById("toasts");
+    const item = document.createElement("div");
+    item.className = "toast " +
+        (type === "success" ? "toast-success" : type === "error" ? "toast-error" : "");
+    item.textContent = message;
+    container.appendChild(item);
+    setTimeout(() => item.remove(), 3000);
+}
+
+/* =====================================
+   THEME
+===================================== */
+window.toggleTheme = function () {
+    S.theme = S.theme === "dark" ? "light" : "dark";
+    try { localStorage.setItem(CONFIG.themeKey, S.theme); } catch (e) {}
+    render();
+};
+
+/* =====================================
+   RENDER
+===================================== */
+function render() {
+    if (S.theme === "dark") document.documentElement.setAttribute("data-theme", "dark");
+    else document.documentElement.removeAttribute("data-theme");
+    renderLogin();
+}
+
+function renderLogin() {
+    document.getElementById("app").innerHTML = `
+        <div class="login-container">
+            <div class="login-box glass">
+
+                ${CONFIG.logo ? `
+                    <div style="text-align:center;margin-bottom:15px">
+                        <img src="${CONFIG.logo}" style="height:60px;border-radius:12px"
+                             onerror="this.style.display='none'" alt="Good Bites Logo">
+                    </div>` : ""}
+
+                <h2>Good Bites</h2>
+                <p class="subtitle">SHOP MANAGEMENT</p>
+
+                <div class="login-tabs">
+                    <div class="login-tab active" id="ltTeam" onclick="switchLoginTab('team')">Team Login</div>
+                    <div class="login-tab" id="ltAdmin" onclick="switchLoginTab('admin')">Admin Login</div>
+                </div>
+
+                <div id="loginFormArea"></div>
+
+                <div style="text-align:center;margin-top:20px">
+                    <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Toggle dark mode">
+                        ${S.theme === "dark" ? "☀" : "☾"}
+                    </button>
+                </div>
+
+            </div>
+        </div>
+        <div class="app-footer">© ${new Date().getFullYear()} Good Bites — SHOP MANAGEMENT</div>
+    `;
+    showLoginForm("team");
+}
+
+window.switchLoginTab = function (tab) {
+    document.getElementById("ltTeam").className = "login-tab" + (tab === "team" ? " active" : "");
+    document.getElementById("ltAdmin").className = "login-tab" + (tab === "admin" ? " active" : "");
+    showLoginForm(tab);
+};
+
+function showLoginForm(tab) {
+    const area = document.getElementById("loginFormArea");
+    if (!area) return;
+
+    if (tab === "team") {
+        area.innerHTML = `
+            <form id="teamLoginForm">
+                <div class="form-group">
+                    <label>USERNAME</label>
+                    <input id="lTeamId" autocomplete="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label>PASSWORD</label>
+                    <input id="lTeamPw" type="password" autocomplete="current-password" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn-primary login-button">Login →</button>
+            </form>`;
+        document.getElementById("teamLoginForm").addEventListener("submit", e => {
+            e.preventDefault();
+            doTeamLogin();
+        });
+    } else {
+        area.innerHTML = `
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label>ADMIN PASSWORD</label>
+                    <input id="lAdminPw" type="password" autocomplete="current-password" placeholder="Enter admin password" required>
+                </div>
+                <button type="submit" class="btn-primary login-button">Login as Admin →</button>
+            </form>`;
+        document.getElementById("adminLoginForm").addEventListener("submit", e => {
+            e.preventDefault();
+            doAdminLogin();
+        });
+    }
+}
+
+/* =====================================
+   TEAM / SHOP LOGIN
+   Haya (haya / haya@955)      → index.html
+   Other team accounts          → index.html
+   Shop (made in admin panel)   → index.html
+===================================== */
+window.doTeamLogin = async function () {
+    const id = document.getElementById("lTeamId").value.trim().toLowerCase();
+    const pw = document.getElementById("lTeamPw").value;
+
+    /* 1. Haya account: username haya, password haya@955 → index.html */
+    if (id === CONFIG.defaultTeam.loginId && pw === CONFIG.defaultTeam.password) {
+        startSession({
+            username: CONFIG.defaultTeam.name,
+            role: "team",
+            displayRole: CONFIG.defaultTeam.name
+        });
+        sessionStorage.setItem("goodBitesTeamId", CONFIG.defaultTeam.id);
+        sessionStorage.setItem("goodBitesShopName", CONFIG.defaultTeam.name);
+        toast("Login successful!", "success");
+        window.location.replace("index.html");
+        return;
+    }
+
+    /* 2. Other team accounts saved in this browser */
+    const team = S.teams.find(t =>
+        String(t.loginId || "").trim().toLowerCase() === id &&
+        String(t.password || "") === pw
+    );
+
+    if (team) {
+        startSession({ username: team.name, role: "team", displayRole: team.name });
+        sessionStorage.setItem("goodBitesTeamId", team.id);
+        sessionStorage.setItem("goodBitesShopName", team.name);
+        toast("Login successful!", "success");
+        window.location.replace("index.html");
+        return;
+    }
+
+    /* 3. Shop account created from the admin panel → shop.html */
+    await loadShopsShared();
+    const shop = loadShops().find(s =>
+        String(s.username || "").trim().toLowerCase() === id &&
+        String(s.password || "") === pw
+    );
+
+    if (shop) {
+        if ((shop.status || "active") !== "active") {
+            toast("This shop is closed. Contact the administrator.", "error");
+            return;
+        }
+        const sid = String(shop.id || shop._id);
+        startSession({ username: shop.name, role: "team", displayRole: shop.name, shopId: sid });
+        sessionStorage.setItem("goodBitesShopName", shop.name);
+        toast("Login successful!", "success");
+        window.location.replace("index.html");
+        return;
+    }
+
+    toast("Invalid username or password", "error");
+};
+
+/* =====================================
+   ADMIN LOGIN → admin.html
+===================================== */
+window.doAdminLogin = function () {
+    const pw = document.getElementById("lAdminPw").value;
+
+    if (pw !== CONFIG.adminPass) {
+        toast("Wrong admin password", "error");
+        return;
+    }
+
+    startSession({ username: "Admin", role: "admin", displayRole: "Administrator" });
+    toast("Login successful!", "success");
+    window.location.replace("admin.html");
+};
+
+/* =====================================
+   START
+===================================== */
+loadTeams();
+render();
+</script>
+
+</body>
+</html>

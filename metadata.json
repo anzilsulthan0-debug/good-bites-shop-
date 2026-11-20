@@ -1,0 +1,6 @@
+{
+  "name": "Good Bites",
+  "description": "Good Bites multi-shop management, receipts, real-time sync, and mobile app platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#b8891f">
+<title>Good Bites — Shops</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<script>
+/* Apply saved theme before first paint (same key as shop.html, admin.html and login.html) */
+(function () {
+    try {
+        if (localStorage.getItem("goodBitesTheme") === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+        }
+    } catch (e) {}
+})();
+</script>
+
+<style>
+:root {
+    --bg:#fbf8f1;
+    --surface:#ffffff;
+    --surface-2:#faf5e8;
+    --ink:#2b2416;
+    --muted:#7d735e;
+    --line:#ece3cc;
+    --gold:#b8891f;
+    --gold-2:#e2bf62;
+    --gold-soft:#f6ecd0;
+    --gold-ink:#8a6414;
+    --green:#16834d;
+    --green-soft:#e3f4ea;
+    --red:#c0392b;
+    --red-soft:#fdecea;
+    --amber:#b4631b;
+    --amber-soft:#fff0e1;
+    --shadow:0 1px 2px rgba(60,44,10,.06), 0 8px 24px rgba(60,44,10,.06);
+    --radius:16px;
+    --font:'Manrope', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+    --display:'Fraunces', Georgia, serif;
+}
+
+[data-theme="dark"] {
+    --bg:#101114;
+    --surface:#1a1c21;
+    --surface-2:#22242a;
+    --ink:#f3efe4;
+    --muted:#a7a192;
+    --line:#32343b;
+    --gold:#d9ac3f;
+    --gold-2:#f0cf7a;
+    --gold-soft:#332b17;
+    --gold-ink:#f0cf7a;
+    --green:#4cc98a;
+    --green-soft:#16301f;
+    --red:#ff8b7d;
+    --red-soft:#3a2321;
+    --amber:#f0a45e;
+    --amber-soft:#36271a;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+}
+
+* { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+
+body {
+    font-family:var(--font);
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:env(safe-area-inset-bottom);
+}
+
+button, input, select, textarea { font:inherit; color:inherit; }
+button { cursor:pointer; }
+:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+
+/* ---------- Top bar ---------- */
+.topbar {
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:12px clamp(14px, 4vw, 36px);
+    padding-top:calc(12px + env(safe-area-inset-top));
+    background:color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter:saturate(1.4) blur(14px);
+    -webkit-backdrop-filter:saturate(1.4) blur(14px);
+    border-bottom:1px solid var(--line);
+}
+
+.brand { display:flex; align-items:center; gap:10px; min-width:0; text-decoration:none; color:inherit; }
+.brand img { width:44px; height:44px; object-fit:contain; flex-shrink:0; }
+.brand h2 { font-family:var(--display); font-size:20px; font-weight:700; letter-spacing:-.01em; white-space:nowrap; }
+.brand h2 span { color:var(--gold); }
+.brand small { display:block; font-size:11px; color:var(--muted); font-weight:600; }
+
+.top-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+
+.btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    border:1px solid var(--line); background:var(--surface); color:var(--ink);
+    padding:9px 14px; border-radius:10px; font-weight:700; font-size:13px;
+    transition:background .15s, border-color .15s, transform .1s;
+    text-decoration:none;
+}
+.btn:hover { background:var(--surface-2); border-color:var(--gold-2); }
+.btn:active { transform:translateY(1px); }
+.btn:disabled { opacity:.6; cursor:default; }
+.btn-sm { padding:7px 12px; font-size:12px; border-radius:8px; }
+.btn-primary { background:linear-gradient(135deg, var(--gold), var(--gold-2)); color:#fff; border-color:transparent; }
+.btn-primary:hover { background:linear-gradient(135deg, var(--gold), var(--gold-2)); filter:brightness(.95); border-color:transparent; }
+.btn-danger { color:var(--red); background:var(--red-soft); border-color:transparent; }
+.btn-danger:hover { background:var(--red-soft); filter:brightness(.97); border-color:var(--red); }
+
+.pill {
+    display:inline-flex; align-items:center; gap:7px;
+    padding:7px 12px; border-radius:999px; font-size:12px; font-weight:700;
+    background:var(--surface-2); border:1px solid var(--line); color:var(--muted);
+}
+.pill.live { color:var(--green); background:var(--green-soft); border-color:transparent; }
+.pill i { width:8px; height:8px; border-radius:50%; background:currentColor; display:block; }
+.pill.live i { animation:pulse 1.8s ease-out infinite; }
+@keyframes pulse {
+    0% { box-shadow:0 0 0 0 color-mix(in srgb, var(--green) 55%, transparent); }
+    100% { box-shadow:0 0 0 8px transparent; }
+}
+
+/* ---------- Layout ---------- */
+.wrap { max-width:1200px; margin:0 auto; padding:clamp(18px, 3vw, 34px) clamp(14px, 4vw, 36px) 40px; }
+
+.intro { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:20px; }
+.intro h1 { font-family:var(--display); font-size:clamp(28px, 4.5vw, 42px); line-height:1.1; letter-spacing:-.02em; }
+.intro p { color:var(--muted); font-size:15px; margin-top:6px; max-width:52ch; }
+
+.stats { display:flex; gap:10px; flex-wrap:wrap; }
+.stat {
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:12px 18px; min-width:112px;
+}
+.stat span { display:block; font-size:12px; font-weight:600; color:var(--muted); }
+.stat strong { font-size:24px; font-weight:800; letter-spacing:-.01em; }
+.stat.green strong { color:var(--green); }
+.stat.amber strong { color:var(--amber); }
+
+/* Controls */
+.controls {
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:14px; margin-bottom:22px; box-shadow:var(--shadow);
+    display:grid; gap:12px;
+}
+.controls-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+.search { position:relative; flex:1 1 260px; min-width:0; }
+.search svg { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:17px; height:17px; stroke:var(--muted); fill:none; stroke-width:2; pointer-events:none; }
+.search input {
+    width:100%; padding:11px 40px 11px 40px; border:1px solid var(--line); border-radius:999px;
+    background:var(--surface-2); outline:none; transition:border-color .15s, box-shadow .15s;
+}
+.search input:focus { border-color:var(--gold); box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 20%, transparent); }
+.search button {
+    position:absolute; right:10px; top:50%; transform:translateY(-50%);
+    width:24px; height:24px; border-radius:50%; border:none; background:var(--line); color:var(--muted);
+    display:none; place-items:center; font-size:15px; line-height:1;
+}
+
+select.sort {
+    padding:10px 14px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2);
+    font-weight:600; font-size:13px; outline:none;
+}
+select.sort:focus { border-color:var(--gold); }
+
+.chips { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding-bottom:2px; }
+.chips::-webkit-scrollbar { display:none; }
+.chip {
+    display:inline-flex; align-items:center; gap:7px; white-space:nowrap;
+    padding:8px 13px; border-radius:999px; border:1px solid var(--line); background:var(--surface);
+    font-size:12px; font-weight:700; color:var(--muted); transition:background .15s, color .15s, border-color .15s;
+}
+.chip:hover { border-color:var(--gold-2); color:var(--ink); }
+.chip small { font-size:11px; font-weight:700; opacity:.75; }
+.chip[aria-pressed="true"] { background:var(--gold); border-color:var(--gold); color:#fff; }
+
+/* Grid */
+.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:20px; }
+
+.card {
+    background:var(--surface); border:1px solid var(--line); border-radius:18px;
+    overflow:hidden; display:flex; flex-direction:column;
+    transition:border-color .15s, box-shadow .2s, transform .2s;
+}
+.card:hover { border-color:var(--gold-2); box-shadow:var(--shadow); transform:translateY(-2px); }
+.card.closed .media img, .card.closed .media .initial { filter:grayscale(.85); opacity:.8; }
+
+.media { position:relative; height:172px; background:var(--gold-soft); overflow:hidden; }
+.media img { width:100%; height:100%; object-fit:cover; display:block; }
+.initial {
+    width:100%; height:100%; display:grid; place-items:center;
+    font-family:var(--display); font-size:64px; font-weight:700; color:var(--gold);
+    background:linear-gradient(135deg, var(--gold-soft), color-mix(in srgb, var(--gold-2) 30%, var(--gold-soft)));
+}
+
+.badge {
+    position:absolute; top:12px; left:12px;
+    padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700;
+    background:color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter:blur(8px);
+    display:inline-flex; align-items:center; gap:6px;
+}
+.badge i { width:7px; height:7px; border-radius:50%; background:var(--muted); display:block; }
+.badge.open { color:var(--green); }
+.badge.open i { background:var(--green); }
+
+.menu { position:absolute; top:10px; right:10px; z-index:5; }
+.menu-btn {
+    width:34px; height:34px; border-radius:50%; border:1px solid var(--line);
+    background:color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter:blur(8px);
+    display:grid; place-items:center;
+}
+.menu-btn svg { width:18px; height:18px; fill:currentColor; }
+.menu-btn:hover { border-color:var(--gold-2); }
+.menu-list {
+    display:none; position:absolute; top:40px; right:0; width:186px; padding:6px;
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    box-shadow:0 14px 40px rgba(0,0,0,.18);
+}
+.menu-list.show { display:block; animation:drop .15s ease-out; }
+.menu-list button {
+    width:100%; text-align:left; padding:9px 10px; border:none; background:none; border-radius:8px;
+    font-size:13px; font-weight:600;
+}
+.menu-list button:hover { background:var(--surface-2); }
+.menu-list button.danger { color:var(--red); }
+.menu-list button.danger:hover { background:var(--red-soft); }
+@keyframes drop { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+
+.body { padding:16px 18px 18px; display:flex; flex-direction:column; gap:6px; flex:1; }
+.body .cat { font-size:12px; font-weight:700; color:var(--gold-ink); }
+.body h3 { font-size:18px; font-weight:800; letter-spacing:-.01em; overflow-wrap:anywhere; display:-webkit-box; -webkit-line-clamp:1; line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+.body p { color:var(--muted); font-size:13px; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:2.9em; }
+.body p.small { font-size:12px; min-height:0; }
+
+.rstats { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:6px; }
+.rstats div { background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:7px 9px; }
+.rstats span { display:block; font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; }
+.rstats strong { font-size:13px; font-weight:800; }
+.rstats .pending strong { color:var(--amber); }
+
+.foot { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:auto; padding-top:12px; }
+.foot span { font-size:11px; color:var(--muted); font-weight:600; }
+
+/* Skeleton + empty */
+.skeleton { border:1px solid var(--line); border-radius:18px; overflow:hidden; background:var(--surface); height:300px; }
+.skeleton div { background:linear-gradient(90deg, var(--line), var(--surface-2), var(--line)); background-size:200% 100%; animation:shimmer 1.4s infinite; }
+.skeleton .a { height:172px; }
+.skeleton .b { height:14px; width:60%; margin:18px; border-radius:6px; }
+.skeleton .c { height:12px; width:80%; margin:0 18px; border-radius:6px; }
+@keyframes shimmer { from { background-position:200% 0; } to { background-position:-200% 0; } }
+
+.empty {
+    grid-column:1 / -1; text-align:center; padding:48px 18px;
+    border:1px dashed var(--line); border-radius:var(--radius); background:var(--surface);
+}
+.empty h3 { font-family:var(--display); font-size:22px; margin-bottom:6px; }
+.empty p { color:var(--muted); margin:0 auto 16px; max-width:42ch; }
+
+/* Dialogs */
+dialog {
+    border:1px solid var(--line); border-radius:18px; padding:0; background:var(--surface); color:var(--ink);
+    box-shadow:0 24px 70px rgba(0,0,0,.3); width:min(500px, calc(100vw - 28px)); margin:auto; max-height:calc(100vh - 28px);
+}
+dialog::backdrop { background:rgba(20,14,4,.5); backdrop-filter:blur(3px); }
+.dlg-head { padding:20px 22px 4px; }
+.dlg-head h2 { font-family:var(--display); font-size:22px; }
+.dlg-head p { font-size:13px; color:var(--muted); margin-top:2px; }
+.dlg-body { padding:14px 22px; display:grid; gap:14px; overflow-y:auto; max-height:calc(100vh - 220px); }
+.dlg-foot { display:flex; justify-content:flex-end; gap:8px; padding:14px 22px 20px; }
+
+.two { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.field label { display:block; font-size:12px; font-weight:700; color:var(--muted); margin-bottom:6px; }
+.field input, .field select, .field textarea {
+    width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:10px;
+    background:var(--surface-2); outline:none; transition:border-color .15s, box-shadow .15s;
+}
+.field textarea { resize:vertical; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color:var(--gold); box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 20%, transparent); }
+.field input[readonly] { background:var(--gold-soft); color:var(--gold-ink); font-weight:700; }
+.preview { display:none; height:130px; margin-top:8px; border-radius:12px; overflow:hidden; border:1px solid var(--line); background:var(--gold-soft); }
+.preview img { width:100%; height:100%; object-fit:cover; display:block; }
+
+/* Toast */
+#toasts { position:fixed; left:50%; bottom:calc(18px + env(safe-area-inset-bottom)); transform:translateX(-50%); display:grid; gap:8px; z-index:200; width:min(380px, calc(100vw - 28px)); }
+.toast { background:var(--ink); color:var(--bg); padding:11px 16px; border-radius:12px; font-size:13px; font-weight:600; box-shadow:0 10px 30px rgba(0,0,0,.25); animation:drop .2s ease-out; }
+.toast.error { background:var(--red); color:#fff; }
+.toast.info { background:var(--gold); color:#fff; }
+
+.footer { text-align:center; font-size:12px; color:var(--muted); padding:26px 0 6px; }
+
+@media (max-width:640px) {
+    .brand small, #roleBadge { display:none; }
+    .brand h2 { font-size:17px; }
+    .brand img { width:38px; height:38px; }
+    .btn { padding:8px 10px; font-size:12px; }
+    .stats { width:100%; }
+    .stat { flex:1; min-width:0; padding:10px 12px; }
+    .stat strong { font-size:20px; }
+    .grid { grid-template-columns:1fr; }
+    .two { grid-template-columns:1fr; }
+    #addShopBtn { width:100%; }
+}
+@media (prefers-reduced-motion:reduce) {
+    *, *::before, *::after { animation:none !important; transition:none !important; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <a href="index.html" class="brand">
+        <img src="logo.png" alt="Good Bites logo">
+        <div>
+            <h2>Good<span>Bites</span></h2>
+            <small>Multi-shop management</small>
+        </div>
+    </a>
+
+    <div class="top-actions">
+        <span class="pill live" id="livePill" role="status" title="Changes made in other tabs appear here instantly"><i></i><b>Live sync</b></span>
+        <span class="pill" id="roleBadge"><b id="roleLabel">User</b></span>
+        <a class="btn" id="adminLink" href="admin.html" style="display:none">Admin panel</a>
+        <button class="btn" id="themeBtn" type="button" aria-label="Toggle dark mode">Dark</button>
+        <button class="btn btn-danger" id="logoutBtn" type="button">Sign out</button>
+    </div>
+</header>
+
+<main class="wrap">
+
+    <section class="intro">
+        <div>
+            <h1 id="welcomeHeading">Your shops</h1>
+            <p>Open a shop to manage its receipts. Shops and receipts update here right away.</p>
+        </div>
+        <div class="stats" aria-label="Summary">
+            <div class="stat"><span>Total shops</span><strong id="statTotal">0</strong></div>
+            <div class="stat green"><span>Active</span><strong id="statActive">0</strong></div>
+            <div class="stat amber"><span>Closed</span><strong id="statClosed">0</strong></div>
+            <div class="stat"><span>Receipts</span><strong id="statReceipts">0</strong></div>
+            <div class="stat"><span>Total sales</span><strong id="statSales">₹0.00</strong></div>
+        </div>
+    </section>
+
+    <section class="controls">
+        <div class="controls-row">
+            <div class="search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="text" id="searchInput" placeholder="Search by shop name, category or description" autocomplete="off" aria-label="Search shops">
+                <button type="button" id="clearSearchBtn" aria-label="Clear search">×</button>
+            </div>
+            <select class="sort" id="sortSelect" aria-label="Sort shops">
+                <option value="name-asc">Name A–Z</option>
+                <option value="name-desc">Name Z–A</option>
+                <option value="status-active">Active first</option>
+                <option value="newest">Newest first</option>
+            </select>
+            <button class="btn btn-primary" id="addShopBtn" type="button" style="display:none">Add shop</button>
+        </div>
+        <div class="chips" id="categoryChips" role="group" aria-label="Filter by category"></div>
+    </section>
+
+    <div class="grid" id="shopsGrid">
+        <div class="skeleton"><div class="a"></div><div class="b"></div><div class="c"></div></div>
+        <div class="skeleton"><div class="a"></div><div class="b"></div><div class="c"></div></div>
+        <div class="skeleton"><div class="a"></div><div class="b"></div><div class="c"></div></div>
+    </div>
+
+    <footer class="footer">© 2026 Good Bites. Shop data is stored in this browser.</footer>
+</main>
+
+<!-- Add / edit shop -->
+<dialog id="shopDialog">
+    <form id="shopForm" novalidate>
+        <div class="dlg-head">
+            <h2 id="dlgTitle">Add shop</h2>
+            <p id="dlgSub">Enter the shop details. Login details are created for you.</p>
+        </div>
+        <div class="dlg-body">
+            <input type="hidden" id="shopId">
+            <div class="field">
+                <label for="shopName">Shop name</label>
+                <input type="text" id="shopName" maxlength="80" placeholder="For example, City Supermarket" required>
+            </div>
+            <div class="two">
+                <div class="field">
+                    <label for="shopCategory">Category</label>
+                    <select id="shopCategory"></select>
+                </div>
+                <div class="field">
+                    <label for="shopStatus">Status</label>
+                    <select id="shopStatus">
+                        <option value="active">Active (open)</option>
+                        <option value="inactive">Closed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <label for="shopDescription">Description</label>
+                <textarea id="shopDescription" rows="3" maxlength="300" placeholder="What does this shop sell?"></textarea>
+            </div>
+            <div class="two">
+                <div class="field"><label for="shopAddress">Address</label><input type="text" id="shopAddress" maxlength="160"></div>
+                <div class="field"><label for="shopPhone">Phone</label><input type="tel" id="shopPhone" maxlength="20"></div>
+            </div>
+            <div class="field">
+                <label for="shopImage">Shop image</label>
+                <input type="file" id="shopImage" accept="image/png,image/jpeg,image/webp,image/gif">
+                <div class="preview" id="previewBox"><img id="previewImg" alt="Image preview"></div>
+            </div>
+        </div>
+        <div class="dlg-foot">
+            <button type="button" class="btn" id="cancelShopBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveShopBtn">Add shop</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Login details -->
+<dialog id="credsDialog">
+    <div class="dlg-head">
+        <h2 id="credsTitle">Shop login details</h2>
+        <p id="credsSub"></p>
+    </div>
+    <div class="dlg-body">
+        <div class="field"><label>Shop</label><input type="text" id="credsShop" readonly></div>
+        <div class="field"><label>Username</label><input type="text" id="credsUser" readonly></div>
+        <div class="field"><label>Password</label><input type="text" id="credsPass" readonly></div>
+    </div>
+    <div class="dlg-foot">
+        <button type="button" class="btn" id="credsCopyBtn">Copy details</button>
+        <button type="button" class="btn btn-primary" id="credsDoneBtn">Done</button>
+    </div>
+</dialog>
+
+<!-- Delete confirmation -->
+<dialog id="deleteDialog">
+    <div class="dlg-head">
+        <h2>Delete shop?</h2>
+        <p id="deleteText"></p>
+    </div>
+    <div class="dlg-foot">
+        <button type="button" class="btn" id="deleteCancelBtn">Keep shop</button>
+        <button type="button" class="btn btn-danger" id="deleteConfirmBtn">Delete shop</button>
+    </div>
+</dialog>
+
+<div id="toasts" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="sync.js"></script>
+
+<script>
+/* =========================================================
+   SESSION CHECK (set by login.html)
+   ========================================================= */
+let currentSession = null;
+try {
+    const raw = sessionStorage.getItem("businessManagerSession");
+    currentSession = raw ? JSON.parse(raw) : null;
+} catch (e) { currentSession = null; }
+
+if (!currentSession || currentSession.loggedIn !== true || !currentSession.username) {
+    window.location.replace("login.html");
+    throw new Error("Login required");
+}
+
+const ADMIN_ROLES = ["admin", "administrator", "super admin", "superadmin"];
+const currentRole = String(currentSession.role || sessionStorage.getItem("businessManagerRole") || "user");
+const isAdmin = ADMIN_ROLES.includes(currentRole.toLowerCase());
+
+const $ = id => document.getElementById(id);
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+    })[c]);
+}
+
+function toast(message, kind = "") {
+    const el = document.createElement("div");
+    el.className = "toast " + kind;
+    el.textContent = message;
+    $("toasts").appendChild(el);
+    setTimeout(() => el.remove(), 3200);
+}
+
+/* Role UI */
+const displayRole = currentSession.displayRole || (isAdmin ? "Administrator" : "User");
+$("roleLabel").textContent = displayRole;
+$("welcomeHeading").textContent = "Welcome, " + displayRole;
+if (isAdmin) {
+    $("addShopBtn").style.display = "inline-flex";
+    $("adminLink").style.display = "inline-flex";
+}
+
+$("logoutBtn").addEventListener("click", () => {
+    ["businessManagerSession", "businessManagerRole", "businessManagerUser"]
+        .forEach(k => sessionStorage.removeItem(k));
+    window.location.replace("login.html");
+});
+
+/* =========================================================
+   STORAGE (same keys as login.html, shop.html and admin.html)
+   ========================================================= */
+const STORAGE_KEY = "businessManagerDemoShops";
+const RCP_PREFIX = "businessManagerReceipts_";
+const ACT_KEY = "goodBitesActivityLog";
+const CATEGORIES = [
+    "Grocery & Mart", "Fashion & Wear", "Tech & Mobiles", "Food & Dining",
+    "Health & Pharmacy", "Home & Living", "General"
+];
+
+let shops = [];
+let activeCategory = "ALL";
+let searchQuery = "";
+let currentSort = "name-asc";
+
+function loadShops() {
+    try {
+        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+        console.error("Shop loading error:", err);
+        return [];
+    }
+}
+
+function saveShops() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(shops));
+    } catch (err) {
+        console.error("Shop saving error:", err);
+        toast("Could not save. Browser storage is full. Try a smaller image.", "error");
+        return false;
+    }
+    /* Send to the cloud too, so team devices (index.html) update live */
+    GB.set(STORAGE_KEY, shops).catch(err => {
+        console.error("Cloud save error:", err);
+        toast("Saved on this device, but cloud sync failed.", "error");
+    });
+    return true;
+}
+
+const shopId = s => String(s.id || s._id);
+const isOpen = s => (s.status || "active") === "active";
+
+/* Receipt numbers for every shop card */
+const money = n => "₹" + (Number(n) || 0).toLocaleString("en-IN", { minimumFractionDigits:2, maximumFractionDigits:2 });
+const amt = r => (Number(r.quantity) || 0) * (Number(r.price) || 0);
+const pend = r => Math.max(0, (Number(r.quantity) || 0) - (Number(r.givenQuantity) || 0));
+
+function shopReceipts(s) {
+    try {
+        const list = JSON.parse(localStorage.getItem(RCP_PREFIX + shopId(s)) || "[]");
+        return Array.isArray(list) ? list : [];
+    } catch (e) { return []; }
+}
+
+function shopTotals(s) {
+    const list = shopReceipts(s);
+    return {
+        count: list.length,
+        sales: list.reduce((a, r) => a + amt(r), 0),
+        pending: list.reduce((a, r) => a + pend(r), 0)
+    };
+}
+
+/* Activity log (shown in admin.html) */
+function logActivity(action, detail) {
+    try {
+        const l = JSON.parse(localStorage.getItem(ACT_KEY) || "[]");
+        l.unshift({ t:new Date().toISOString(), u:currentSession.username, a:action, d:detail || "" });
+        localStorage.setItem(ACT_KEY, JSON.stringify(l.slice(0, 500)));
+    } catch (e) {}
+}
+
+/* =========================================================
+   LIVE SYNC
+   Shops or receipts changed in another tab / window (admin.html,
+   shop.html) → this page updates at once.
+   ========================================================= */
+const GB = window.GBStore;
+let refreshTimer = null;
+GB.watch(key => key === STORAGE_KEY || key.startsWith(RCP_PREFIX), key => {
+    shops = loadShops();
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(() => {
+        renderAll();
+        toast(key === STORAGE_KEY ? "Shops updated" : "Receipts updated", "info");
+    }, 120);
+});
+
+/* Also refresh when coming back to this tab */
+document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) { shops = loadShops(); renderAll(); }
+});
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+const grid = $("shopsGrid");
+
+function updateStats() {
+    const open = shops.filter(isOpen).length;
+    let receipts = 0, sales = 0;
+    shops.forEach(s => { const t = shopTotals(s); receipts += t.count; sales += t.sales; });
+    $("statTotal").textContent = shops.length;
+    $("statActive").textContent = open;
+    $("statClosed").textContent = shops.length - open;
+    $("statReceipts").textContent = receipts;
+    $("statSales").textContent = money(sales);
+}
+
+function renderChips() {
+    const counts = { ALL: shops.length };
+    shops.forEach(s => {
+        const c = s.category || "General";
+        counts[c] = (counts[c] || 0) + 1;
+    });
+    const names = ["ALL", ...CATEGORIES];
+    $("categoryChips").innerHTML = names.map(name => `
+        <button class="chip" type="button" data-category="${escapeHTML(name)}" aria-pressed="${name === activeCategory}">
+            ${name === "ALL" ? "All shops" : escapeHTML(name)} <small>${counts[name] || 0}</small>
+        </button>`).join("");
+}
+
+function renderShops() {
+    const q = searchQuery;
+    let list = shops.filter(s => {
+        if (activeCategory !== "ALL" && (s.category || "General").toLowerCase() !== activeCategory.toLowerCase()) return false;
+        if (!q) return true;
+        return [s.name, s.description, s.category].some(v => String(v || "").toLowerCase().includes(q));
+    });
+
+    list.sort((a, b) => {
+        if (currentSort === "name-asc") return String(a.name || "").localeCompare(String(b.name || ""));
+        if (currentSort === "name-desc") return String(b.name || "").localeCompare(String(a.name || ""));
+        if (currentSort === "status-active") return (isOpen(b) ? 1 : 0) - (isOpen(a) ? 1 : 0);
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    });
+
+    if (!list.length) {
+        const filtered = shops.length > 0;
+        grid.innerHTML = `
+            <div class="empty">
+                <h3>${filtered ? "No shops match your search" : "No shops yet"}</h3>
+                <p>${filtered ? "Try a different word or clear the category filter."
+                    : isAdmin ? "Select Add shop to register the first one." : "An administrator has not added any shops yet."}</p>
+                ${filtered ? `<button class="btn" type="button" id="resetFiltersBtn">Clear filters</button>` : ""}
+            </div>`;
+        return;
+    }
+
+    grid.innerHTML = list.map(s => {
+        const id = escapeHTML(shopId(s));
+        const open = isOpen(s);
+        const hasImage = typeof s.image === "string" && s.image.trim() !== "";
+        const initial = escapeHTML((String(s.name || "?").trim()[0] || "?").toUpperCase());
+        const t = shopTotals(s);
+        const contact = [s.address, s.phone].filter(Boolean).join(" · ");
+
+        const media = hasImage
+            ? `<img src="${escapeHTML(s.image)}" alt="${escapeHTML(s.name)}" data-initial="${initial}" loading="lazy">`
+            : `<div class="initial" aria-hidden="true">${initial}</div>`;
+
+        const menu = isAdmin ? `
+            <div class="menu">
+                <button type="button" class="menu-btn" aria-label="Options for ${escapeHTML(s.name)}" aria-expanded="false" data-action="menu" data-id="${id}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+                </button>
+                <div class="menu-list" id="menu-${id}">
+                    <button type="button" data-action="edit" data-id="${id}">Edit shop</button>
+                    <button type="button" data-action="toggle-status" data-id="${id}">${open ? "Mark as closed" : "Mark as active"}</button>
+                    <button type="button" data-action="credentials" data-id="${id}">Login details</button>
+                    <button type="button" class="danger" data-action="delete" data-id="${id}">Delete shop</button>
+                </div>
+            </div>` : "";
+
+        return `
+        <article class="card ${open ? "" : "closed"}">
+            <div class="media">
+                ${media}
+                <span class="badge ${open ? "open" : ""}"><i></i>${open ? "Active" : "Closed"}</span>
+                ${menu}
+            </div>
+            <div class="body">
+                <span class="cat">${escapeHTML(s.category || "General")}</span>
+                <h3>${escapeHTML(s.name)}</h3>
+                <p>${escapeHTML(s.description || "Manage receipts and given pieces for this shop.")}</p>
+                ${contact ? `<p class="small">${escapeHTML(contact)}</p>` : ""}
+                <div class="rstats">
+                    <div><span>Receipts</span><strong>${t.count}</strong></div>
+                    <div><span>Sales</span><strong>${escapeHTML(money(t.sales))}</strong></div>
+                    <div class="pending"><span>Pending</span><strong>${t.pending}</strong></div>
+                </div>
+                <div class="foot">
+                    <span>ID ${escapeHTML(shopId(s).slice(-6).toUpperCase())}</span>
+                    <button type="button" class="btn btn-sm" data-action="open" data-id="${id}">Open shop</button>
+                </div>
+            </div>
+        </article>`;
+    }).join("");
+
+    /* Broken image: show the initial instead */
+    grid.querySelectorAll("img[data-initial]").forEach(img => {
+        img.addEventListener("error", () => {
+            const div = document.createElement("div");
+            div.className = "initial";
+            div.textContent = img.dataset.initial;
+            img.replaceWith(div);
+        }, { once: true });
+    });
+}
+
+function renderAll() {
+    updateStats();
+    renderChips();
+    renderShops();
+}
+
+/* =========================================================
+   FILTERS
+   ========================================================= */
+$("searchInput").addEventListener("input", e => {
+    searchQuery = e.target.value.trim().toLowerCase();
+    $("clearSearchBtn").style.display = searchQuery ? "grid" : "none";
+    renderShops();
+});
+
+$("clearSearchBtn").addEventListener("click", () => {
+    $("searchInput").value = "";
+    searchQuery = "";
+    $("clearSearchBtn").style.display = "none";
+    renderShops();
+    $("searchInput").focus();
+});
+
+$("sortSelect").addEventListener("change", e => { currentSort = e.target.value; renderShops(); });
+
+$("categoryChips").addEventListener("click", e => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    activeCategory = chip.dataset.category;
+    renderChips();
+    renderShops();
+});
+
+/* =========================================================
+   CARD ACTIONS
+   ========================================================= */
+function closeAllMenus() {
+    document.querySelectorAll(".menu-list.show").forEach(m => m.classList.remove("show"));
+    document.querySelectorAll(".menu-btn[aria-expanded='true']").forEach(b => b.setAttribute("aria-expanded", "false"));
+}
+
+document.addEventListener("click", e => { if (!e.target.closest(".menu")) closeAllMenus(); });
+
+grid.addEventListener("click", e => {
+    if (e.target.id === "resetFiltersBtn") {
+        searchQuery = ""; activeCategory = "ALL";
+        $("searchInput").value = ""; $("clearSearchBtn").style.display = "none";
+        renderChips(); renderShops();
+        return;
+    }
+
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+
+    const { id, action } = btn.dataset;
+    const shop = shops.find(s => shopId(s) === id);
+
+    if (action === "menu") {
+        const menu = $("menu-" + id);
+        const wasOpen = menu.classList.contains("show");
+        closeAllMenus();
+        if (!wasOpen) { menu.classList.add("show"); btn.setAttribute("aria-expanded", "true"); }
+        return;
+    }
+
+    closeAllMenus();
+    if (!shop) return;
+
+    if (action === "open") {
+        window.location.href = "shop.html?id=" + encodeURIComponent(id);
+        return;
+    }
+
+    if (!isAdmin) return toast("Only administrators can do this.", "error");
+
+    if (action === "edit") return openShopDialog(shop);
+
+    if (action === "toggle-status") {
+        shops = loadShops();
+        const target = shops.find(s => shopId(s) === id);
+        if (!target) return;
+        target.status = isOpen(target) ? "inactive" : "active";
+        if (saveShops()) {
+            renderAll();
+            logActivity(isOpen(target) ? "Shop activated" : "Shop deactivated", target.name);
+            toast(target.name + (isOpen(target) ? " is now active" : " is now closed"));
+        }
+        return;
+    }
+
+    if (action === "credentials") {
+        return showCredentials(shop.name, shop.username || "-", shop.password || "-", true);
+    }
+
+    if (action === "delete") return askDelete(shop);
+});
+
+/* =========================================================
+   DIALOG HELPERS
+   ========================================================= */
+document.querySelectorAll("dialog").forEach(d => {
+    d.addEventListener("click", e => { if (e.target === d) d.close(); });   // click on backdrop
+});
+
+/* ---------- Delete ---------- */
+let deleteTarget = null;
+
+function askDelete(shop) {
+    deleteTarget = shop;
+    $("deleteText").textContent = shop.name + " and all of its receipts will be removed. This cannot be undone.";
+    $("deleteDialog").showModal();
+}
+
+$("deleteCancelBtn").addEventListener("click", () => $("deleteDialog").close());
+
+$("deleteConfirmBtn").addEventListener("click", () => {
+    if (!isAdmin || !deleteTarget) return;
+    const id = shopId(deleteTarget);
+    const name = deleteTarget.name;
+
+    shops = loadShops();
+    const before = shops;
+    shops = shops.filter(s => shopId(s) !== id);
+
+    if (saveShops()) {
+        GB.remove(RCP_PREFIX + id).catch(err => console.error("Receipt cleanup error:", err));
+        renderAll();
+        logActivity("Shop deleted", name);
+        toast(name + " deleted");
+    } else {
+        shops = before;
+    }
+    deleteTarget = null;
+    $("deleteDialog").close();
+});
+
+/* ---------- Login details ---------- */
+let credsText = "";
+
+function showCredentials(shopName, username, password, viewing) {
+    $("credsTitle").textContent = viewing ? "Shop login details" : "Shop created";
+    $("credsSub").textContent = viewing
+        ? "Use these details to sign in to this shop."
+        : "Save these login details and share them with the shop.";
+    $("credsShop").value = shopName;
+    $("credsUser").value = username;
+    $("credsPass").value = password;
+    credsText = "Shop: " + shopName + "\nUsername: " + username + "\nPassword: " + password;
+    $("credsCopyBtn").textContent = "Copy details";
+    $("credsDialog").showModal();
+}
+
+$("credsCopyBtn").addEventListener("click", async e => {
+    try { await navigator.clipboard.writeText(credsText); e.target.textContent = "Copied"; }
+    catch (err) { e.target.textContent = "Copy failed"; }
+});
+$("credsDoneBtn").addEventListener("click", () => $("credsDialog").close());
+
+/* ---------- Add / edit shop ---------- */
+const shopDialog = $("shopDialog");
+const form = $("shopForm");
+const fileInput = $("shopImage");
+const previewBox = $("previewBox");
+const previewImg = $("previewImg");
+const saveBtn = $("saveShopBtn");
+
+$("shopCategory").innerHTML = CATEGORIES.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join("");
+
+function openShopDialog(shop) {
+    if (!isAdmin) return toast("Admin permission required.", "error");
+    closeAllMenus();
+    form.reset();
+
+    const editing = Boolean(shop);
+    $("shopId").value = editing ? shopId(shop) : "";
+    $("dlgTitle").textContent = editing ? "Edit shop" : "Add shop";
+    $("dlgSub").textContent = editing
+        ? "Update the details for " + (shop.name || "this shop") + "."
+        : "Enter the shop details. Login details are created for you.";
+    saveBtn.textContent = editing ? "Save changes" : "Add shop";
+
+    $("shopCategory").value = editing ? (shop.category || "General") : CATEGORIES[0];
+    $("shopStatus").value = editing ? (shop.status || "active") : "active";
+    if (editing) {
+        $("shopName").value = shop.name || "";
+        $("shopDescription").value = shop.description || "";
+        $("shopAddress").value = shop.address || "";
+        $("shopPhone").value = shop.phone || "";
+    }
+
+    if (editing && shop.image) {
+        previewImg.src = shop.image;
+        previewBox.style.display = "block";
+    } else {
+        previewImg.removeAttribute("src");
+        previewBox.style.display = "none";
+    }
+
+    shopDialog.showModal();
+    $("shopName").focus();
+}
+
+$("addShopBtn").addEventListener("click", () => openShopDialog(null));
+$("cancelShopBtn").addEventListener("click", () => shopDialog.close());
+
+fileInput.addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!["image/png", "image/jpeg", "image/webp", "image/gif"].includes(file.type)) {
+        toast("Choose a PNG, JPG, WEBP or GIF image.", "error");
+        fileInput.value = "";
+        return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+        toast("Image must be under 5 MB.", "error");
+        fileInput.value = "";
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = ev => { previewImg.src = ev.target.result; previewBox.style.display = "block"; };
+    reader.onerror = () => toast("Could not preview the image.", "error");
+    reader.readAsDataURL(file);
+});
+
+/* Login details for new shops */
+const RESERVED_USERNAMES = ["admin", "haya", "honey", "life"];
+const slugify = text => String(text || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+function generateShopUsername(name) {
+    const base = slugify(name).slice(0, 12) || "shop";
+    let username = base, n = 1;
+    const taken = () => RESERVED_USERNAMES.includes(username) ||
+        shops.some(s => String(s.username || "").toLowerCase() === username);
+    while (taken()) { n++; username = base + n; }
+    return username;
+}
+
+function generateShopPassword(name) {
+    const base = slugify(name).slice(0, 6) || "shop";
+    return base + "@" + Math.floor(100 + Math.random() * 900);
+}
+
+/* Shrink the picked image so it fits in browser storage */
+function compressImage(file, maxSize = 800, quality = 0.8) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("Could not read the image."));
+        reader.onload = () => {
+            const img = new Image();
+            img.onerror = () => reject(new Error("Invalid image file."));
+            img.onload = () => {
+                const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.max(1, Math.round(img.width * scale));
+                canvas.height = Math.max(1, Math.round(img.height * scale));
+                const ctx = canvas.getContext("2d");
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL("image/jpeg", quality));
+            };
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+form.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!isAdmin) return toast("Admin permission required.", "error");
+    if (saveBtn.disabled) return;
+
+    const id = $("shopId").value.trim();
+    const name = $("shopName").value.trim();
+    const category = $("shopCategory").value;
+    const status = $("shopStatus").value;
+    const description = $("shopDescription").value.trim();
+    const address = $("shopAddress").value.trim();
+    const phone = $("shopPhone").value.trim();
+    const file = fileInput.files[0];
+
+    if (!name) { toast("Enter a shop name.", "error"); $("shopName").focus(); return; }
+
+    /* Always work on the latest saved list (another tab may have changed it) */
+    shops = loadShops();
+
+    const editing = Boolean(id);
+    const existing = editing ? shops.find(s => shopId(s) === id) : null;
+    if (editing && !existing) return toast("This shop no longer exists.", "error");
+
+    const duplicate = shops.some(s =>
+        String(s.name || "").trim().toLowerCase() === name.toLowerCase() && shopId(s) !== id);
+    if (duplicate) { toast("A shop with this name already exists.", "error"); return; }
+
+    const originalText = saveBtn.textContent;
+    saveBtn.disabled = true;
+    saveBtn.textContent = editing ? "Saving…" : "Creating…";
+
+    try {
+        const imageValue = file ? await compressImage(file) : undefined;
+        const previous = JSON.parse(JSON.stringify(shops));
+        let credentials = null;
+
+        if (editing) {
+            Object.assign(existing, { name, category, status, description, address, phone });
+            if (imageValue !== undefined) existing.image = imageValue;
+        } else {
+            const username = generateShopUsername(name);
+            const password = generateShopPassword(name);
+            shops.push({
+                id: "shop_" + Date.now(),
+                name, category, status, description, address, phone,
+                image: imageValue || "",
+                username, password,
+                createdAt: new Date().toISOString()
+            });
+            credentials = { username, password };
+        }
+
+        if (!saveShops()) { shops = previous; return; }
+
+        shopDialog.close();
+        renderAll();
+
+        logActivity(editing ? "Shop updated" : "Shop created", name);
+        if (credentials) showCredentials(name, credentials.username, credentials.password, false);
+        else toast("Shop updated");
+
+    } catch (err) {
+        console.error("Save shop error:", err);
+        toast(err.message || "Could not save the shop.", "error");
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = originalText;
+    }
+});
+
+/* =========================================================
+   THEME
+   ========================================================= */
+function syncThemeButton() {
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    $("themeBtn").textContent = dark ? "Light" : "Dark";
+}
+$("themeBtn").addEventListener("click", () => {
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    if (dark) document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", "dark");
+    try { localStorage.setItem("goodBitesTheme", dark ? "light" : "dark"); } catch (e) {}
+    syncThemeButton();
+});
+syncThemeButton();
+
+/* =========================================================
+   START
+   ========================================================= */
+shops = loadShops();
+renderAll();
+GB.init();
+GB.syncUp().then(() => GB.pullAll()).then(() => { shops = loadShops(); renderAll(); });
+</script>
+</body>
+</html>
